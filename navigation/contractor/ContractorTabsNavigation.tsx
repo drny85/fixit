@@ -3,6 +3,7 @@ import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 import ContractorHomeStack from './ContractorHomeStack';
 import { Feather } from '@expo/vector-icons';
 import { useAppSelector } from '../../redux/store';
+import ContractorRequestStack from './ContractorRequestStack';
 
 const { Navigator, Screen } = createBottomTabNavigator();
 
@@ -46,12 +47,22 @@ const ContractorTabsNavigation = () => {
 				}}
 			/>
 			<Screen
-				name='ContractorRequestsScreen'
-				component={ContractorHomeStack}
+				name='RequestStack'
+				component={ContractorRequestStack}
 				options={{
 					title: 'Requests',
 					tabBarIcon: ({ focused, color, size }) => (
 						<TabBarIcon name='layers' />
+					),
+				}}
+			/>
+			<Screen
+				name='MessageStack'
+				component={ContractorRequestStack}
+				options={{
+					title: 'Message',
+					tabBarIcon: ({ focused, color, size }) => (
+						<TabBarIcon name='message-square' />
 					),
 				}}
 			/>

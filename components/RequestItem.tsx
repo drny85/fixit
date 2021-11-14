@@ -5,6 +5,7 @@ import styled from 'styled-components/native';
 import { Divider, Text } from '.';
 import { Request } from '../redux/requestReducer/requestActions';
 import { useAppSelector } from '../redux/store';
+import { isContractor } from '../utils/isContractor';
 
 interface Props {
 	request: Request;
@@ -13,6 +14,7 @@ interface Props {
 
 const RequestItem: FC<Props> = ({ request, onPress }) => {
 	const theme = useAppSelector((state) => state.theme);
+	const { user } = useAppSelector((state) => state.auth);
 	return (
 		<RequestView
 			style={{
@@ -33,7 +35,12 @@ const RequestItem: FC<Props> = ({ request, onPress }) => {
 				</Text>
 				<Text>Job Date: {moment(request.serviceDate).format('ll')}</Text>
 				<Text>Submitted on: {moment(request.receivedOn).format('lll')}</Text>
-				<Text>Contractor: {request.contractor?.name}</Text>
+				<Text>
+					{isContractor(request) ? 'Customer:' : 'Contractor'}{' '}
+					{isContractor(request)
+						? request.customer?.name
+						: request.contractor?.name}
+				</Text>
 			</Container>
 			<FontAwesome name='chevron-right' size={20} />
 		</RequestView>

@@ -9,7 +9,7 @@ import useCachedResources from './hooks/useCachedResources';
 import AuthStack from './navigation/AuthStack';
 import store, { useAppSelector } from './redux/store';
 import { ThemeProvider } from 'styled-components';
-import { ActivityIndicator, LogBox } from 'react-native';
+import { LogBox } from 'react-native';
 import AdminTabsNavigation from './navigation/admin/AdminTabsNavigation';
 import ContractorTabsNavigation from './navigation/contractor/ContractorTabsNavigation';
 import ConsumerTabsNavigation from './navigation/consumer/ConsumerTabsNavigation';
@@ -37,7 +37,7 @@ const App: React.FC = () => {
 						<ContractorTabsNavigation />
 					) : user && role === 'consumer' ? (
 						<ConsumerTabsNavigation />
-					) : !loading ? (
+					) : loading ? (
 						<Loader />
 					) : (
 						<AuthStack />

@@ -77,6 +77,12 @@ export type RequestTabParamList = {
 	Home: undefined;
 };
 
+export type ContractorRequestParamList = {
+	ContractorHome: undefined;
+	ContractorRequestsScreen: undefined;
+	ContractorRequestDetails: { request: Request };
+};
+
 export type HomeScreenNavigationProp = CompositeNavigationProp<
 	BottomTabNavigationProp<RootTabParamList, 'HomeStack'>,
 	NativeStackNavigationProp<HomeTabParamList>

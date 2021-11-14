@@ -3,7 +3,7 @@ import { db } from '../firebase';
 import { setUsers } from '../redux/authReducer/authSlider';
 import { useAppSelector, useAppDispatch } from '../redux/store';
 
-export default function useRequests() {
+export default function useContractors() {
 	const dispatch = useAppDispatch();
 	const { users } = useAppSelector((state) => state.auth);
 	const [loading, setLoading] = useState(true);

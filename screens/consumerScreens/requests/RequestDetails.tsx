@@ -16,7 +16,6 @@ import ReviewModal from '../../../components/ReviewModal';
 import { SIZES } from '../../../constants';
 import { Contractor, Review } from '../../../constants/Contractors';
 import { statusBarHeight } from '../../../constants/Layout';
-import { auth, db } from '../../../firebase';
 
 import { Request } from '../../../redux/requestReducer/requestActions';
 import {
@@ -48,7 +47,9 @@ const RequestDetails: FC<Props> = ({ navigation, route }) => {
 
 	const alreadyReviewed = useCallback(() => {
 		const index = reviews.findIndex((s) => s.requestId === request?.id);
-		if (index !== -1) return false;
+
+		if (index === -1) return false;
+
 		return true;
 	}, [request]);
 
@@ -124,8 +125,6 @@ const RequestDetails: FC<Props> = ({ navigation, route }) => {
 			</View>
 		);
 	};
-
-	console.log(reviews.some((r) => r.reviewer.userId === user?.id));
 
 	return (
 		<Screen>
