@@ -1,17 +1,15 @@
 import { NativeStackScreenProps } from '@react-navigation/native-stack';
-import React, { FC } from 'react';
+import React, { FC, useEffect } from 'react';
 import { FlatList, ListRenderItem, View } from 'react-native';
-import {
-	Button,
-	Header,
-	Loader,
-	RequestItem,
-	Screen,
-	Text,
-} from '../../components';
-import { SIZES } from '../../constants';
+import { Header, Loader, RequestItem, Screen, Text } from '../../components';
+
 import useRequests from '../../hooks/useRequests';
-import { Request } from '../../redux/requestReducer/requestActions';
+import {
+	Request,
+	updateRequest,
+} from '../../redux/requestReducer/requestActions';
+import { setRequest } from '../../redux/requestReducer/requestSlide';
+import { useAppDispatch } from '../../redux/store';
 import { ContractorRequestParamList } from '../../types';
 
 type Props = NativeStackScreenProps<
@@ -21,21 +19,33 @@ type Props = NativeStackScreenProps<
 
 const ContractorResquestsScreen: FC<Props> = ({ navigation }) => {
 	const { requests, loading, user } = useRequests();
+	const dispatch = useAppDispatch();
+	const onAcceptRequest = async (request: Request) => {
+		try {
+			const newRequest = { ...request };
+			newRequest.status = 'accepted';
+			await dispatch(updateRequest(newRequest));
+		} catch (error) {}
+	};
 	const renderItem: ListRenderItem<Request> = ({ item }) => (
 		<RequestItem
+			onAcceptRequest={() => onAcceptRequest(item)}
 			request={item}
-			onPress={() =>
-				navigation.navigate('ContractorRequestDetails', { request: item })
-			}
+			onPress={() => {
+				dispatch(setRequest(item));
+				navigation.navigate('ContractorRequestDetails');
+			}}
 		/>
 	);
+
+	useEffect(() => {}, []);
 
 	if (loading) return <Loader />;
 
 	return (
 		<Screen>
 			<Header title={'My Requests'} />
-			<View style={{ marginTop: SIZES.statusBarHeight + 20 }}>
+			<View>
 				{requests.length > 0 && (
 					<FlatList
 						data={requests}

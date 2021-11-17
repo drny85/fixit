@@ -21,9 +21,9 @@ const App: React.FC = () => {
 	const isLoadingComplete = useCachedResources();
 	const { user, loading, role } = useAppSelector((state) => state.auth);
 	const theme = useAppSelector((state) => state.theme);
-	console.log(isLoadingComplete, loading);
+	console.log('HERE', isLoadingComplete, loading);
 
-	if (!isLoadingComplete) {
+	if (!isLoadingComplete || loading) {
 		return <Loader />;
 	}
 
@@ -31,14 +31,12 @@ const App: React.FC = () => {
 		<ThemeProvider theme={theme}>
 			<SafeAreaProvider>
 				<NavigationContainer>
-					{user && role === 'admin' ? (
+					{user && user.role === 'admin' && role === 'admin' ? (
 						<AdminTabsNavigation />
-					) : user && role === 'contractor' ? (
+					) : user && user.role === 'contractor' && role === 'contractor' ? (
 						<ContractorTabsNavigation />
-					) : user && role === 'consumer' ? (
+					) : user && user.role === 'consumer' && role === 'consumer' ? (
 						<ConsumerTabsNavigation />
-					) : loading ? (
-						<Loader />
 					) : (
 						<AuthStack />
 					)}

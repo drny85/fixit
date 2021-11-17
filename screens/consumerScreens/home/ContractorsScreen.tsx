@@ -23,10 +23,11 @@ type Props = NativeStackScreenProps<HomeTabParamList, 'ContractorScreen'>;
 const ContractorScreen: FC<Props> = ({ route, navigation }) => {
 	const theme = useAppSelector((state) => state.theme);
 	const { requests } = useAppSelector((state) => state.requests);
+	const { user } = useAppSelector((state) => state.auth);
 	const { contractor } = route.params;
 	const dispatch = useAppDispatch();
 	const { reviews, loading } = useAppSelector((state) => state.reviews);
-	console.log(reviews.length, loading);
+
 	const onFinishRating = (rating: number) => {};
 
 	const calculatePreviewServicesCount = (): number => {
@@ -67,7 +68,11 @@ const ContractorScreen: FC<Props> = ({ route, navigation }) => {
 					}}
 				>
 					<Text bold capitalize>
-						{item.showName ? item.reviewer.name : 'anonymous'}
+						{item.reviewer.userId === user?.id
+							? 'Me'
+							: item.showName
+							? item.reviewer.name
+							: 'anonymous'}
 					</Text>
 					<Text caption capitalize>
 						Recommended{' '}

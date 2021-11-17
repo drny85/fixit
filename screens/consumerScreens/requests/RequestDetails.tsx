@@ -48,6 +48,7 @@ const RequestDetails: FC<Props> = ({ navigation, route }) => {
 	const alreadyReviewed = useCallback(() => {
 		const index = reviews.findIndex((s) => s.requestId === request?.id);
 
+		if (reviews.length === 0) return false;
 		if (index === -1) return false;
 
 		return true;
@@ -132,16 +133,15 @@ const RequestDetails: FC<Props> = ({ navigation, route }) => {
 			<ViewContainer>
 				<View
 					style={{
-						marginTop: statusBarHeight + 20,
 						padding: SIZES.padding * 0.5,
 					}}
 				>
-					<Text capitalize center xlarge>
+					<Text capitalize center large>
 						Status: {request?.status}
 					</Text>
 					{user?.role === 'consumer' &&
 						request?.status === 'completed' &&
-						alreadyReviewed() && (
+						!alreadyReviewed() && (
 							<View
 								style={{
 									width: SIZES.isSmallDevice

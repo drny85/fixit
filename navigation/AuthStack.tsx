@@ -13,6 +13,7 @@ import SignupStatus from '../screens/authScreens/SignupStatus';
 const { Navigator, Screen } = createNativeStackNavigator<AuthTabParamList>();
 
 const AuthStack: FC = () => {
+	console.log('Auth Stack');
 	return (
 		<Navigator>
 			<Screen

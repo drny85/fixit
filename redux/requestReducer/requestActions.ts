@@ -2,7 +2,7 @@ import { createAsyncThunk } from '@reduxjs/toolkit';
 import { Service } from '../../constants/Services';
 import { Contractor } from '../../constants/Contractors';
 import { db } from '../../firebase';
-import { User } from '../../types';
+import { Log, User } from '../../types';
 import { saveOrChangeImageToDatabase } from '../../utils/saveImages';
 import { RootState } from '../store';
 
@@ -16,8 +16,10 @@ export interface Request {
 	serviceDate: string;
 	dateCompleted?: string | null;
 	serviceTime: string;
+	logs?: Log[];
 	status:
 		| 'under review'
+		| 'accepted'
 		| 'pending'
 		| 'approved'
 		| 'working on'
@@ -96,15 +98,26 @@ export const getRequestByUserIdAndRequestId = createAsyncThunk(
 	'requests/getRequestByUserIdAndRequestId',
 	async (requestId: string, { getState, rejectWithValue }) => {
 		try {
-			const {
-				auth: { user },
-			} = getState() as RootState;
-
 			const res = await db.collection('requests').doc(requestId).get();
 
 			return { id: res.id, ...res.data() } as Request;
 		} catch (error: any) {
 			return rejectWithValue({ message: error.message });
+		}
+	}
+);
+
+export const updateRequest = createAsyncThunk(
+	'requests/updateRequest',
+	async (request: Request, { rejectWithValue }) => {
+		try {
+			const res = await db.collection('requests').doc(request.id);
+			await res.set(request, { merge: true });
+			const data = await res.get();
+
+			return { id: data.id, ...data.data() } as Request;
+		} catch (error) {
+			return rejectWithValue({ message: error });
 		}
 	}
 );

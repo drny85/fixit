@@ -23,10 +23,6 @@ const Header: FC<Props> = ({ title, onPressRight, iconName, canGoBack }) => {
 				justifyContent: title ? 'space-between' : 'flex-start',
 				alignItems: 'center',
 				flexDirection: 'row',
-				position: 'absolute',
-				top: statusBarHeight,
-				left: 0,
-				right: 0,
 				zIndex: 99,
 			}}
 		>

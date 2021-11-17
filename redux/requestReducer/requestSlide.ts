@@ -5,6 +5,7 @@ import {
 	getRequestByUserIdAndRequestId,
 	getRequestsByContractor,
 	Request,
+	updateRequest,
 } from './requestActions';
 
 interface IState {
@@ -28,6 +29,10 @@ const requestSlide = createSlice({
 		getRequests: (state, { payload }: PayloadAction<Request[]>) => {
 			state.loading = false;
 			state.requests = payload;
+		},
+		setRequest: (state, { payload }) => {
+			state.loading = false;
+			state.request = payload;
 		},
 		resetRequests: (state) => {
 			state.loading = false;
@@ -73,10 +78,16 @@ const requestSlide = createSlice({
 				state.error = error.message;
 				state.loading = false;
 				state.request = null;
+			})
+			.addCase(updateRequest.pending, (state) => {
+				state.loading = true;
+			})
+			.addCase(updateRequest.fulfilled, (state, { payload }) => {
+				(state.loading = false), (state.request = payload as Request);
 			});
 	},
 });
 
-export const { getRequests, resetRequests } = requestSlide.actions;
+export const { getRequests, resetRequests, setRequest } = requestSlide.actions;
 
 export default requestSlide.reducer;

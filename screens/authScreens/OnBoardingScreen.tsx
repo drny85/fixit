@@ -37,6 +37,7 @@ const OnBoardingScreen: FC<Props> = ({ navigation }) => {
 			} catch (error) {
 				console.log(error);
 			} finally {
+				setLoading(false);
 			}
 		})();
 	}, []);
@@ -167,6 +168,7 @@ const OnBoardingScreen: FC<Props> = ({ navigation }) => {
 					style={{
 						flexDirection: 'row',
 						justifyContent: 'space-between',
+						alignSelf: 'center',
 						marginHorizontal: 25,
 						marginTop: 20,
 					}}

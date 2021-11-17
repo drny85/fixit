@@ -2,7 +2,7 @@ import { FontAwesome } from '@expo/vector-icons';
 import moment from 'moment';
 import React, { FC } from 'react';
 import styled from 'styled-components/native';
-import { Divider, Text } from '.';
+import { Button, Divider, Text } from '.';
 import { Request } from '../redux/requestReducer/requestActions';
 import { useAppSelector } from '../redux/store';
 import { isContractor } from '../utils/isContractor';
@@ -10,11 +10,11 @@ import { isContractor } from '../utils/isContractor';
 interface Props {
 	request: Request;
 	onPress: () => void;
+	onAcceptRequest?: any;
 }
 
-const RequestItem: FC<Props> = ({ request, onPress }) => {
+const RequestItem: FC<Props> = ({ request, onPress, onAcceptRequest }) => {
 	const theme = useAppSelector((state) => state.theme);
-	const { user } = useAppSelector((state) => state.auth);
 	return (
 		<RequestView
 			style={{
@@ -34,6 +34,7 @@ const RequestItem: FC<Props> = ({ request, onPress }) => {
 					Status: {request.status}
 				</Text>
 				<Text>Job Date: {moment(request.serviceDate).format('ll')}</Text>
+				<Text>Time: {request.serviceTime}</Text>
 				<Text>Submitted on: {moment(request.receivedOn).format('lll')}</Text>
 				<Text>
 					{isContractor(request) ? 'Customer:' : 'Contractor'}{' '}
@@ -41,6 +42,16 @@ const RequestItem: FC<Props> = ({ request, onPress }) => {
 						? request.customer?.name
 						: request.contractor?.name}
 				</Text>
+				{isContractor(request) && request.status === 'pending' && (
+					<ButtonContainer>
+						<Button
+							style={{ backgroundColor: theme.BACKGROUND_COLOR }}
+							onPress={onAcceptRequest}
+						>
+							<Text bold>Accept Request</Text>
+						</Button>
+					</ButtonContainer>
+				)}
 			</Container>
 			<FontAwesome name='chevron-right' size={20} />
 		</RequestView>
@@ -53,6 +64,7 @@ const RequestView = styled.TouchableOpacity`
 	padding: 10px;
 	margin: 5px 10px;
 	border-radius: 10px;
+	position: relative;
 	flex-direction: row;
 	justify-content: space-between;
 	align-items: center;
@@ -60,3 +72,6 @@ const RequestView = styled.TouchableOpacity`
 `;
 
 const Container = styled.View``;
+const ButtonContainer = styled.View`
+	align-self: center;
+`;

@@ -59,6 +59,16 @@ export type HomeTabParamList = {
 	SuccessScreen: undefined;
 };
 
+export type RequestStatus =
+	| 'under review'
+	| 'accepted'
+	| 'pending'
+	| 'approved'
+	| 'working on'
+	| 'completed'
+	| 'declided'
+	| undefined;
+
 export type SettingsTabParamList = {
 	Profile: undefined;
 };
@@ -80,7 +90,7 @@ export type RequestTabParamList = {
 export type ContractorRequestParamList = {
 	ContractorHome: undefined;
 	ContractorRequestsScreen: undefined;
-	ContractorRequestDetails: { request: Request };
+	ContractorRequestDetails: undefined;
 };
 
 export type HomeScreenNavigationProp = CompositeNavigationProp<
@@ -109,4 +119,10 @@ export interface Theme {
 	SECONDARY_BUTTON_COLOR: string;
 	STATUS_BAR: string;
 	ASCENT: string;
+}
+
+export interface Log {
+	requestId: string;
+	body: string;
+	loggedOn: string;
 }

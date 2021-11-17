@@ -1,5 +1,5 @@
-import { NativeStackScreenProps } from '@react-navigation/native-stack';
 import React, { FC } from 'react';
+import { NativeStackScreenProps } from '@react-navigation/native-stack';
 import { FlatList, ListRenderItem, View } from 'react-native';
 import {
 	Button,
@@ -9,7 +9,6 @@ import {
 	Screen,
 	Text,
 } from '../../../components';
-import { statusBarHeight } from '../../../constants/Layout';
 import { Request } from '../../../redux/requestReducer/requestActions';
 import { RequestTabParamList } from '../../../types';
 import useRequests from '../../../hooks/useRequests';
@@ -32,33 +31,31 @@ const RequestsScreen: FC<Props> = ({ navigation }) => {
 	return (
 		<Screen>
 			<Header title={user?.role === 'consumer' ? 'My Requests' : 'My Jobs'} />
-			<View style={{ marginTop: statusBarHeight + 20 }}>
-				{requests.length > 0 && (
+			<View style={{ flex: 1 }}>
+				{requests.length > 0 && !loading ? (
 					<FlatList
 						data={requests}
 						keyExtractor={(_, index) => index.toString()}
 						renderItem={renderItem}
 					/>
-				)}
-			</View>
-			{requests.length === 0 && !loading && (
-				<View
-					style={{
-						flex: 1,
-						justifyContent: 'center',
-						alignItems: 'center',
-					}}
-				>
-					<Text bold center>
-						No Request
-					</Text>
-					{user?.role === 'consumer' && !loading && (
+				) : (
+					<View
+						style={{
+							flex: 1,
+							justifyContent: 'center',
+							alignItems: 'center',
+						}}
+					>
+						<Text bold center>
+							No Request
+						</Text>
+
 						<Button onPress={() => navigation.navigate('Home')}>
 							<Text bold>Submit First Request</Text>
 						</Button>
-					)}
-				</View>
-			)}
+					</View>
+				)}
+			</View>
 		</Screen>
 	);
 };
