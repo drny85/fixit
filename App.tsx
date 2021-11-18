@@ -21,7 +21,6 @@ const App: React.FC = () => {
 	const isLoadingComplete = useCachedResources();
 	const { user, loading, role } = useAppSelector((state) => state.auth);
 	const theme = useAppSelector((state) => state.theme);
-	console.log('HERE', isLoadingComplete, loading);
 
 	if (!isLoadingComplete || loading) {
 		return <Loader />;

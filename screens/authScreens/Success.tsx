@@ -1,6 +1,6 @@
+import React, { FC } from 'react';
 import { NativeStackScreenProps } from '@react-navigation/native-stack';
 import AnimatedLottieView from 'lottie-react-native';
-import React, { FC } from 'react';
 import { View } from 'react-native';
 import styled from 'styled-components/native';
 import { Divider, Screen, Text } from '../../components';

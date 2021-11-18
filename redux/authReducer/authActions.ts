@@ -66,14 +66,15 @@ export const singupUser = async (
 						.doc(user?.uid)
 						.set({
 							...userData,
+						})
+						.then(() => {
+							user?.sendEmailVerification();
+							return { success: true };
 						});
 				}
-				user?.sendEmailVerification();
-				return { success: true };
 			})
 			.catch((er) => console.log(er));
-
-		return { success: false };
+		return { success: true };
 	} catch (error) {
 		return { success: false };
 	}

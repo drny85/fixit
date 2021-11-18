@@ -1,7 +1,76 @@
 const functions = require('firebase-functions');
 const admin = require('firebase-admin');
+const { HttpsError } = require('firebase-functions/v1/https');
+const fetch = require('node-fetch');
 
 admin.initializeApp();
+
+exports.sendNotificationOnSignUp = functions.firestore
+	.document('users/{userId}')
+	.onCreate(async (snap, context) => {
+		try {
+			const data = snap.data();
+			const userId = context.params.userId;
+			const adminUser = await admin
+				.auth()
+				.getUserByEmail('melendez@robertdev.net');
+			if (!adminUser) return;
+			const me = await admin
+				.firestore()
+				.collection('users')
+				.doc(adminUser.uid)
+				.get();
+			const token = await me.data().pushToken;
+			if (!token) return;
+
+			return fetch('https://exp.host/--/api/v2/push/send', {
+				method: 'POST',
+				headers: {
+					host: 'exp.host',
+					accept: 'application/json',
+					'accept-encoding': 'gzip, deflate',
+					'content-type': 'application/json',
+				},
+				body: JSON.stringify({
+					to: token,
+					title: `New Sign Up`,
+					body: `${data.name} just signup, \n Email: ${data.email}`,
+					data: { notificationType: 'new_signup', userId },
+				}),
+			});
+		} catch (error) {
+			return HttpsError(`Error ${error}`);
+		}
+	});
+
+exports.sendNotificationOnNewRequest = functions.firestore
+	.document('requests/{requestId}')
+	.onCreate(async (snap, context) => {
+		try {
+			const data = snap.data();
+			const token = data.contractor.pushToken;
+			const requestId = context.params.requestId;
+			if (!token) return;
+
+			return fetch('https://exp.host/--/api/v2/push/send', {
+				method: 'POST',
+				headers: {
+					host: 'exp.host',
+					accept: 'application/json',
+					'accept-encoding': 'gzip, deflate',
+					'content-type': 'application/json',
+				},
+				body: JSON.stringify({
+					to: token,
+					title: `New Job Request`,
+					body: `${data.customer.name} just submitted a request, \n Request For: ${data.service.name}`,
+					data: { notificationType: 'new_request', requestId },
+				}),
+			});
+		} catch (error) {
+			return HttpsError(`Error ${error}`);
+		}
+	});
 
 // // Create and Deploy Your First Cloud Functions
 exports.makeUserAContractor = functions.https.onCall(async (data, context) => {

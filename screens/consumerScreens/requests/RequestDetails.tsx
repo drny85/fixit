@@ -15,7 +15,6 @@ import ImagesContainer from '../../../components/ImagesContainer';
 import ReviewModal from '../../../components/ReviewModal';
 import { SIZES } from '../../../constants';
 import { Contractor, Review } from '../../../constants/Contractors';
-import { statusBarHeight } from '../../../constants/Layout';
 
 import { Request } from '../../../redux/requestReducer/requestActions';
 import {
@@ -30,6 +29,7 @@ type Props = NativeStackScreenProps<RequestTabParamList, 'RequestDetails'>;
 const RequestDetails: FC<Props> = ({ navigation, route }) => {
 	const { request } = route.params;
 	const dispatch = useAppDispatch();
+
 	const [viewImage, setViewImage] = useState<boolean>(false);
 	const [selectedImage, setSelectedImage] = useState<string>('');
 	const [review, setReview] = useState<string>('');

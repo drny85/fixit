@@ -23,6 +23,7 @@ export default function useCachedResources() {
 					if (authState.emailVerified) {
 						authState.getIdTokenResult().then((res) => {
 							const role = res.claims.role;
+							console.log(role);
 							if (role) {
 								dispatch(setUserRole(role));
 							} else {
@@ -32,7 +33,7 @@ export default function useCachedResources() {
 
 						return dispatch(autoSignInUser(authState.uid));
 					} else {
-						dispatch(logout());
+						//dispatch(logout());
 					}
 					//return dispatch(logout());
 				}

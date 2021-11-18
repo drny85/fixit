@@ -5,24 +5,29 @@ import styled from 'styled-components/native';
 import { Button, Loader, Screen, Text } from '../../components';
 import { functions } from '../../firebase';
 import useContractors from '../../hooks/useContractors';
+import useNotifications from '../../hooks/useNotifications';
 
 const Dashboard: FC = () => {
-	//const { users, loading } = useContractors();
+	useNotifications();
+	const { users, loading } = useContractors();
 
-	//	if (loading) return <Loader />;
+	if (loading) return <Loader />;
 
-	// const makeUserAContractor = async () => {
-	// 	try {
-	// 		const funcRef = functions.httpsCallable('makeUserAContractor');
+	const makeUserAContractor = async () => {
+		try {
+			const funcRef = functions.httpsCallable('makeUserAContractor');
 
-	// 		await funcRef({ email: 'drny85@me.com' });
-	// 	} catch (error) {
-	// 		console.log(error);
-	// 	}
-	// };
+			await funcRef({ email: 'drny85@gmail.com' });
+		} catch (error) {
+			console.log(error);
+		}
+	};
 	return (
-		<Screen>
-			<Text>Dashboard</Text>
+		<Screen center>
+			<Text>Admin Dashboard</Text>
+			<Button onPress={makeUserAContractor}>
+				<Text>Make Admin</Text>
+			</Button>
 		</Screen>
 	);
 };

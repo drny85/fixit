@@ -71,11 +71,12 @@ const SignUpScreen: FC<Props> = ({ navigation }) => {
 			}
 
 			const success = await singupUser(userData);
-			console.log('SUCESS', success);
-			if (success) {
-				navigation.replace('Success', { email, signupType: 'consumer' });
+
+			if (success.success) {
+				return navigation.replace('Success', { email, signupType: 'consumer' });
 			} else {
 				console.log('SSSS', success);
+				return;
 			}
 		} catch (error: any) {
 			Alert.alert('Error', error.message, [{ text: 'OK', style: 'cancel' }]);

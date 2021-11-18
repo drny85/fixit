@@ -28,7 +28,7 @@ Notifications.setNotificationHandler({
 
 let pushToken = null;
 const useNotifications = () => {
-	const naviagtion = useNavigation();
+	const naviagtion = useNavigation<any>();
 
 	const notificationListener = useRef<any>();
 	const responseListener = useRef<any>();
@@ -49,8 +49,22 @@ const useNotifications = () => {
 				(response: Notifications.NotificationResponse) => {
 					const { content } = response.notification.request;
 					const { data } = content;
+
 					if (!data) return;
 					console.log('Notification Data', data);
+					if (
+						data.notificationType === 'new_signup' &&
+						user?.role === 'admin'
+					) {
+						naviagtion.navigate('ContractorsDashboard', {
+							userId: data.userId,
+						});
+					} else if (
+						data.notificationType === 'new_request' &&
+						user?.role === 'consumer'
+					) {
+						naviagtion.navigate('OrdersStack');
+					}
 				}
 			);
 

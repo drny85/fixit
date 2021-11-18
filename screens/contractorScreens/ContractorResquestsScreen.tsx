@@ -2,6 +2,7 @@ import { NativeStackScreenProps } from '@react-navigation/native-stack';
 import React, { FC, useEffect } from 'react';
 import { FlatList, ListRenderItem, View } from 'react-native';
 import { Header, Loader, RequestItem, Screen, Text } from '../../components';
+import { SIZES } from '../../constants';
 
 import useRequests from '../../hooks/useRequests';
 import {
@@ -45,7 +46,13 @@ const ContractorResquestsScreen: FC<Props> = ({ navigation }) => {
 	return (
 		<Screen>
 			<Header title={'My Requests'} />
-			<View>
+			<View
+				style={{
+					flex: 1,
+					width: SIZES.isSmallDevice ? SIZES.width * 0.95 : SIZES.width * 0.7,
+					alignSelf: 'center',
+				}}
+			>
 				{requests.length > 0 && (
 					<FlatList
 						data={requests}

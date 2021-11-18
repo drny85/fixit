@@ -16,9 +16,12 @@ import CheckBoxItem from '../../components/CheckBoxItem';
 import EmailLink from '../../components/EmailLink';
 import ImagesContainer from '../../components/ImagesContainer';
 import LogItem from '../../components/LogItem';
+import SwipableItem from '../../components/SwipableItem';
 import { SIZES } from '../../constants';
 import { Contractor } from '../../constants/Contractors';
 import { STATUS } from '../../constants/DispositonStatus';
+import 'react-native-get-random-values';
+import { nanoid } from 'nanoid';
 import {
 	Request,
 	updateRequest,
@@ -31,6 +34,7 @@ type Props = NativeStackScreenProps<RequestTabParamList, 'RequestDetails'>;
 const ContractorRequestDetails: FC<Props> = ({ navigation, route }) => {
 	const dispatch = useAppDispatch();
 	let rowRefs = new Map();
+	const [opened, setOpened] = useState<any>(null);
 	const [saving, setSaving] = useState<boolean>(false);
 	const [viewImage, setViewImage] = useState<boolean>(false);
 	const [showLogModal, setShowLogModal] = useState<boolean>(false);
@@ -59,6 +63,7 @@ const ContractorRequestDetails: FC<Props> = ({ navigation, route }) => {
 		try {
 			if (log === '') return;
 			const logToSave: Log = {
+				id: nanoid(),
 				loggedOn: new Date().toISOString(),
 				body: log,
 				requestId: request?.id!,
@@ -100,6 +105,8 @@ const ContractorRequestDetails: FC<Props> = ({ navigation, route }) => {
 				setLog('');
 
 				setShowLogModal(false);
+				console.log(opened);
+				//rowRefs.get(opened)?.closed();
 			} catch (error) {
 				console.log(error);
 			} finally {
@@ -190,6 +197,7 @@ const ContractorRequestDetails: FC<Props> = ({ navigation, route }) => {
 						<View>
 							{STATUS.map((s) => (
 								<CheckBoxItem
+									key={s}
 									title={s!}
 									checked={s === status?.toLowerCase()}
 									onPress={() => setStatus(s)}
@@ -214,16 +222,27 @@ const ContractorRequestDetails: FC<Props> = ({ navigation, route }) => {
 
 	return (
 		<Screen>
-			<Header
-				canGoBack
-				title={`Request for ${request!.service?.name}`}
-				onPressRight={() => setShowEditModal(true)}
-				iconName='edit'
-			/>
+			<View
+				style={{
+					width: SIZES.isSmallDevice ? SIZES.width * 0.95 : SIZES.width * 0.75,
+					alignSelf: 'center',
+				}}
+			>
+				<Header
+					canGoBack
+					title={`Request for ${request!.service?.name}`}
+					onPressRight={() => setShowEditModal(true)}
+					iconName='edit'
+				/>
+			</View>
 			<ViewContainer showsVerticalScrollIndicator={false}>
 				<View
 					style={{
-						padding: SIZES.padding * 0.5,
+						flex: 1,
+						width: SIZES.isSmallDevice
+							? SIZES.width * 0.95
+							: SIZES.width * 0.75,
+						alignSelf: 'center',
 					}}
 				>
 					<Text capitalize center large>
@@ -259,42 +278,86 @@ const ContractorRequestDetails: FC<Props> = ({ navigation, route }) => {
 					</Text>
 					<Text>{request?.description}</Text>
 				</View>
-				<Divider large />
-				<LogsContainer>
-					<Header
-						title={`Job Logs (${request?.logs?.length})`}
-						onPressRight={() => setShowLogModal(true)}
-						iconName='plus-square'
-					/>
-					<LogsView
-						showsVerticalScrollIndicator={false}
-						style={{ height: 300 }}
-					>
-						{request?.logs &&
-							request.logs.length > 0 &&
-							request.logs.map((l, index) => (
-								<LogItem
-									ref={(ref: any) => {
-										if (ref && !rowRefs.get(l.loggedOn)) {
-											rowRefs.set(l.loggedOn, ref);
-										}
-									}}
-									theme={theme}
-									key={index.toString()}
-									log={l}
-									onDelete={() => handleDeleteLog(l)}
-									onSwipeableWillOpen={() => {
-										[...rowRefs.entries()].forEach(([key, ref]) => {
-											if (key !== l.loggedOn && ref) ref.close();
-										});
-									}}
-								/>
-							))}
-					</LogsView>
-				</LogsContainer>
+				<View
+					style={{
+						flex: 1,
+						width: SIZES.isSmallDevice
+							? SIZES.width * 0.95
+							: SIZES.width * 0.75,
+						alignSelf: 'center',
+					}}
+				>
+					<LogsContainer>
+						<Divider large />
+						<Header
+							title={`Job Logs (${
+								request?.logs?.length ? request.logs.length : 0
+							})`}
+							onPressRight={() => setShowLogModal(true)}
+							iconName='plus-square'
+						/>
+						<LogsView
+							showsVerticalScrollIndicator={false}
+							style={{ height: SIZES.width * 0.6, marginBottom: 20 }}
+						>
+							{request?.logs &&
+								request.logs.length > 0 &&
+								request.logs.map((l) => (
+									<SwipableItem
+										key={l.id}
+										rigthStyle={{
+											width: '30%',
+											flexDirection: 'row',
+											justifyContent: 'space-around',
+										}}
+										rigthIconName='trash'
+										onRightIconPress={() => handleDeleteLog(l)}
+										ref={(ref: any) => {
+											if (ref && !rowRefs.get(l.id)) {
+												rowRefs.set(l.id, ref);
+											}
+										}}
+										onSwipeableWillOpen={() => {
+											setOpened(l.id);
+											[...rowRefs.entries()].forEach(([key, ref]) => {
+												if (key !== l.id && ref) ref.close();
+											});
+										}}
+									>
+										<View
+											style={{
+												shadowColor: theme.PRIMARY_BUTTON_COLOR,
+												shadowOffset: { width: 5, height: 3 },
+												shadowOpacity: 0.4,
+												shadowRadius: 6,
+												elevation: 6,
+												marginVertical: SIZES.padding * 0.3,
+												backgroundColor: theme.PRIMARY_BUTTON_COLOR,
+												padding: SIZES.padding * 0.3,
+												borderRadius: SIZES.radius,
+											}}
+										>
+											<Text bold>{l.body}</Text>
+											<Text caption right>
+												{moment(l.loggedOn).format('llll')}
+											</Text>
+										</View>
+									</SwipableItem>
+								))}
+						</LogsView>
+					</LogsContainer>
+				</View>
 			</ViewContainer>
-			{renderLogModal()}
-			{renderEditModal()}
+			<View
+				style={{
+					flex: 1,
+					width: SIZES.isSmallDevice ? SIZES.width * 0.95 : SIZES.width * 0.75,
+					alignSelf: 'center',
+				}}
+			>
+				{renderLogModal()}
+				{renderEditModal()}
+			</View>
 		</Screen>
 	);
 };

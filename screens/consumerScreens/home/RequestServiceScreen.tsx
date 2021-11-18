@@ -1,6 +1,6 @@
 import { FontAwesome } from '@expo/vector-icons';
 import { NativeStackScreenProps } from '@react-navigation/native-stack';
-import React, { FC, useState } from 'react';
+import React, { FC, useState, useRef } from 'react';
 import {
 	ScrollView,
 	TouchableOpacity,
@@ -10,6 +10,8 @@ import {
 	Modal,
 	Alert,
 	ImageBackground,
+	ScrollViewProps,
+	ScrollViewComponent,
 } from 'react-native';
 import styled from 'styled-components/native';
 import { KeyboardAwareScrollView } from 'react-native-keyboard-aware-scroll-view';
@@ -42,6 +44,8 @@ type Props = NativeStackScreenProps<HomeTabParamList, 'RequestServiceScreen'>;
 
 const RequestServiceScreen: FC<Props> = ({ route, navigation }) => {
 	const { images, pickImages } = useImages();
+	const inputRef = useRef<any>();
+	const scrollRef = useRef<any>();
 	const [selectedImage, setSelectedImage] = useState<string>('');
 	const [viewImage, setViewImage] = useState(false);
 	const [hoursPicker, setHoursPicker] = useState(false);
@@ -174,7 +178,7 @@ const RequestServiceScreen: FC<Props> = ({ route, navigation }) => {
 							</View>
 							<SubmitRequestButton
 								onPress={handleAddRequest}
-								style={{ marginBottom: 30, flexDirection: 'row' }}
+								style={{ marginBottom: 50, flexDirection: 'row' }}
 							>
 								<Text title>Look Good!</Text>
 								<FontAwesome
@@ -183,6 +187,7 @@ const RequestServiceScreen: FC<Props> = ({ route, navigation }) => {
 									size={24}
 								/>
 							</SubmitRequestButton>
+							<View style={{ marginBottom: 20 }} />
 						</View>
 					</ScrollView>
 				</Modal>
@@ -265,6 +270,7 @@ const RequestServiceScreen: FC<Props> = ({ route, navigation }) => {
 	return (
 		<Screen>
 			<KeyboardAwareScrollView
+				ref={scrollRef}
 				contentContainerStyle={{
 					justifyContent: 'center',
 					width: SIZES.isSmallDevice ? SIZES.width : SIZES.width * 0.6,
@@ -468,6 +474,7 @@ const RequestServiceScreen: FC<Props> = ({ route, navigation }) => {
 					<View>
 						<InputField
 							label='Description'
+							ref={inputRef}
 							contentStyle={{ minHeight: Layout.isSmallDevice ? 80 : 160 }}
 							placeholder='Tell us a brief description about the service you are requesting.'
 							multiline
@@ -493,6 +500,9 @@ const RequestServiceScreen: FC<Props> = ({ route, navigation }) => {
 									'Please type a description about the job',
 									[{ text: 'OK', style: 'cancel' }]
 								);
+								scrollRef.current?.scrollToEnd();
+
+								inputRef.current?.focus();
 
 								return;
 							}

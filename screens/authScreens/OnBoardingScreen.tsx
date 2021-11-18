@@ -32,12 +32,14 @@ const OnBoardingScreen: FC<Props> = ({ navigation }) => {
 
 				if (isSigned) {
 					setLoading(false);
-					navigation.replace('LoginScreen');
+					return navigation.replace('LoginScreen');
 				}
+				setLoading(false);
 			} catch (error) {
 				console.log(error);
-			} finally {
 				setLoading(false);
+			} finally {
+				//setLoading(false);
 			}
 		})();
 	}, []);

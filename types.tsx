@@ -122,6 +122,7 @@ export interface Theme {
 }
 
 export interface Log {
+	id: string;
 	requestId: string;
 	body: string;
 	loggedOn: string;
