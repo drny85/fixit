@@ -10,19 +10,12 @@ import { useAppSelector } from '../redux/store';
 Notifications.setNotificationHandler({
 	handleNotification: async (notification) => {
 		const { data } = notification.request.content;
-		if (data.notificationType === 'new_message') {
-			return {
-				shouldShowAlert: false,
-				shouldPlaySound: false,
-				shouldSetBadge: false,
-			};
-		} else {
-			return {
-				shouldShowAlert: true,
-				shouldPlaySound: false,
-				shouldSetBadge: false,
-			};
-		}
+
+		return {
+			shouldShowAlert: true,
+			shouldPlaySound: false,
+			shouldSetBadge: false,
+		};
 	},
 });
 

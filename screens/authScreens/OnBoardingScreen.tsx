@@ -19,7 +19,6 @@ const OnBoardingScreen: FC<Props> = ({ navigation }) => {
 	const [canContinue, setCanContinue] = useState<boolean>(false);
 	const [currentX, setCurrentX] = useState<number>(0);
 	const theme = useAppSelector((state) => state.theme);
-	const { user } = useAppSelector((state) => state.auth);
 	const scrollX = useRef(new Animated.Value(0)).current;
 	const viewConfig = useRef({ viewAreaCoveragePercentThreshold: 75 }).current;
 	const slideRef = useRef<any>();
