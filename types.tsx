@@ -20,18 +20,18 @@ import { Contractor } from './constants/Contractors';
 import { Request } from './redux/requestReducer/requestActions';
 import { UserData } from './redux/authReducer/authActions';
 
-declare global {
-	namespace ReactNavigation {
-		interface RootParamList extends RootStackParamList {}
-	}
-}
+// declare global {
+// 	namespace ReactNavigation {
+// 		interface RootParamList extends RootStackParamList {}
+// 	}
+// }
 
-export type RootStackParamList = {
+export interface RootStackParamList extends AdminTabParamList {
 	Home: NavigatorScreenParams<HomeStackParamList> | undefined;
 	Contractosr: NavigatorScreenParams<HomeStackParamList> | undefined;
 	ContractorScreen: NavigatorScreenParams<HomeStackParamList> | undefined;
 	RequestServiceScreen: NavigatorScreenParams<HomeStackParamList> | undefined;
-};
+}
 
 export type HomeStackParamList = {
 	Home: { service: Service };
@@ -41,8 +41,8 @@ export type HomeStackParamList = {
 	SuccessScreen: undefined;
 };
 
-export type RootStackScreenProps<Screen extends keyof RootStackParamList> =
-	NativeStackScreenProps<RootStackParamList, Screen>;
+// export type RootStackScreenProps<Screen extends keyof RootStackParamList> =
+// 	NativeStackScreenProps<RootStackParamList, Screen>;
 
 export type RootTabParamList = {
 	HomeStack: undefined;
@@ -57,6 +57,12 @@ export type HomeTabParamList = {
 	ContractorScreen: { contractor: Contractor };
 	RequestServiceScreen: { contractor: Contractor };
 	SuccessScreen: undefined;
+};
+
+export type AdminTabParamList = {
+	Dashboard: undefined;
+	ContractorsDashboard: undefined;
+	AdminContractorDetails: { contratorId: string };
 };
 
 export type RequestStatus =
@@ -97,12 +103,6 @@ export type HomeScreenNavigationProp = CompositeNavigationProp<
 	BottomTabNavigationProp<RootTabParamList, 'HomeStack'>,
 	NativeStackNavigationProp<HomeTabParamList>
 >;
-
-export type RootTabScreenProps<Screen extends keyof RootTabParamList> =
-	CompositeScreenProps<
-		BottomTabScreenProps<RootTabParamList, Screen>,
-		NativeStackScreenProps<RootStackParamList>
-	>;
 
 export interface User extends Contractor {
 	isActive: boolean;

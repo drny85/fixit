@@ -16,6 +16,7 @@ export interface Request {
 	serviceDate: string;
 	dateCompleted?: string | null;
 	serviceTime: string;
+	apt: string | null;
 	logs?: Log[];
 	status:
 		| 'under review'
@@ -27,6 +28,7 @@ export interface Request {
 		| 'declided';
 	contactMethod: 'phone' | 'email';
 	receivedOn: string;
+	serviceAddress?: string;
 	images?: string[];
 }
 

@@ -4,6 +4,7 @@ import ContractorHomeStack from './ContractorHomeStack';
 import { Feather } from '@expo/vector-icons';
 import { useAppSelector } from '../../redux/store';
 import ContractorRequestStack from './ContractorRequestStack';
+import ContractorProfileScreen from '../../screens/contractorScreens/ContractorProfileScreen';
 
 const { Navigator, Screen } = createBottomTabNavigator();
 
@@ -64,6 +65,15 @@ const ContractorTabsNavigation = () => {
 					tabBarIcon: ({ focused, color, size }) => (
 						<TabBarIcon name='message-square' />
 					),
+				}}
+			/>
+
+			<Screen
+				name='ProfileStack'
+				component={ContractorProfileScreen}
+				options={{
+					title: 'Me',
+					tabBarIcon: ({ focused, color, size }) => <TabBarIcon name='user' />,
 				}}
 			/>
 		</Navigator>

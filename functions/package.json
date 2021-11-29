@@ -20,6 +20,7 @@
     "stripe": "^8.186.1"
   },
   "devDependencies": {
+    "@types/stripe": "^8.0.417",
     "firebase-functions-test": "^0.2.0"
   },
   "private": true

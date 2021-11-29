@@ -10,7 +10,7 @@ import { useAppSelector } from '../redux/store';
 interface Props {
 	label: string;
 	onPress: any;
-	errorMessage: React.ReactElement | null;
+	errorMessage?: React.ReactElement | null;
 }
 
 const GoogleAutoComplete: FC<Props> = ({ label, onPress, errorMessage }) => {

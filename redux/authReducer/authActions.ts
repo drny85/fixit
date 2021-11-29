@@ -51,32 +51,24 @@ export const signup = createAsyncThunk(
 
 export const singupUser = async (
 	userData: UserData
-): Promise<{ success: boolean }> => {
+): Promise<{ success: boolean; error: any } | void> => {
 	try {
-		auth
-			.createUserWithEmailAndPassword(
-				userData.email.toLowerCase().trim(),
-				userData.password!
-			)
-			.then((data) => {
-				const { user } = data;
-				delete userData['password'];
-				if (user?.uid) {
-					db.collection('users')
-						.doc(user?.uid)
-						.set({
-							...userData,
-						})
-						.then(() => {
-							user?.sendEmailVerification();
-							return { success: true };
-						});
-				}
-			})
-			.catch((er) => console.log(er));
-		return { success: true };
-	} catch (error) {
-		return { success: false };
+		const { user } = await auth.createUserWithEmailAndPassword(
+			userData.email.toLowerCase().trim(),
+			userData.password!
+		);
+		//if (!user) return;
+		delete userData['password'];
+		await db
+			.collection('users')
+			.doc(user?.uid)
+			.set({ ...userData });
+
+		user?.sendEmailVerification();
+
+		return { success: true, error: null };
+	} catch (error: any) {
+		return { success: false, error: error.message };
 	}
 };
 

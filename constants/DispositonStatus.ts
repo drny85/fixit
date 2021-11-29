@@ -6,4 +6,5 @@ export const STATUS: RequestStatus[] = [
 	'accepted',
 	'approved',
 	'declided',
+	'completed',
 ];

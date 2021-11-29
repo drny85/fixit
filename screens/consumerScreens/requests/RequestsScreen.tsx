@@ -17,7 +17,6 @@ type Props = NativeStackScreenProps<RequestTabParamList, 'RequestScreen'>;
 
 const RequestsScreen: FC<Props> = ({ navigation }) => {
 	const { loading, requests, user } = useRequests();
-	console.log(loading);
 
 	const renderItem: ListRenderItem<Request> = ({ item }) => (
 		<RequestItem

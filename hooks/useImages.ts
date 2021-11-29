@@ -30,8 +30,6 @@ export const useImages = () => {
 				quality: 0.5,
 			});
 
-			console.log(result);
-
 			if (!result.cancelled) {
 				setImages([...images, result.uri]);
 			}

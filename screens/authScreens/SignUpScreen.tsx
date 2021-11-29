@@ -70,13 +70,18 @@ const SignUpScreen: FC<Props> = ({ navigation }) => {
 				return;
 			}
 
-			const success = await singupUser(userData);
-
-			if (success.success) {
-				return navigation.replace('Success', { email, signupType: 'consumer' });
-			} else {
-				console.log('SSSS', success);
+			const response = (await singupUser(userData)) as {
+				success: boolean;
+				error: any;
+			};
+			console.log(response);
+			if (response.success === false) {
+				Alert.alert('Error', response.error, [{ text: 'OK', style: 'cancel' }]);
 				return;
+			}
+
+			if (response.success) {
+				return navigation.replace('Success', { email, signupType: 'consumer' });
 			}
 		} catch (error: any) {
 			Alert.alert('Error', error.message, [{ text: 'OK', style: 'cancel' }]);

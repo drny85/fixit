@@ -10,13 +10,12 @@ import {
 	Modal,
 	Alert,
 	ImageBackground,
-	ScrollViewProps,
-	ScrollViewComponent,
 } from 'react-native';
 import styled from 'styled-components/native';
 import { KeyboardAwareScrollView } from 'react-native-keyboard-aware-scroll-view';
 import {
 	Divider,
+	GoogleAutoComplete,
 	HoursPickerModal,
 	InputField,
 	Screen,
@@ -39,6 +38,10 @@ import {
 } from '../../../redux/requestReducer/requestActions';
 import { useImages } from '../../../hooks/useImages';
 import ImagesContainer from '../../../components/ImagesContainer';
+import {
+	GooglePlaceData,
+	GooglePlaceDetail,
+} from 'react-native-google-places-autocomplete';
 
 type Props = NativeStackScreenProps<HomeTabParamList, 'RequestServiceScreen'>;
 
@@ -48,8 +51,11 @@ const RequestServiceScreen: FC<Props> = ({ route, navigation }) => {
 	const scrollRef = useRef<any>();
 	const [selectedImage, setSelectedImage] = useState<string>('');
 	const [viewImage, setViewImage] = useState(false);
+	const [apt, setApt] = useState<string | null>(null);
 	const [hoursPicker, setHoursPicker] = useState(false);
+	const [pickAddress, setPickAddress] = useState(false);
 	const [selectedHours, setSelectedHours] = useState<string>('');
+	const [address, setAddress] = useState<string>('');
 	const { selectedService, contactMethod } = useAppSelector(
 		(state) => state.services
 	);
@@ -70,6 +76,88 @@ const RequestServiceScreen: FC<Props> = ({ route, navigation }) => {
 		}
 	};
 
+	const renderAddressModal = () => {
+		return (
+			<Modal transparent animationType='slide' visible={pickAddress}>
+				<Overlay>
+					<View
+						style={{
+							backgroundColor: theme.SECONDARY_BUTTON_COLOR,
+							position: 'absolute',
+							left: 0,
+							right: 0,
+							height: SIZES.height * 0.7,
+							bottom: 0,
+							borderTopLeftRadius: SIZES.radius * 3,
+							borderTopRightRadius: SIZES.radius * 3,
+						}}
+					>
+						<View
+							style={{
+								flexDirection: 'row',
+								paddingVertical: SIZES.padding,
+								justifyContent: 'space-between',
+								marginHorizontal: SIZES.padding * 2,
+							}}
+						>
+							<TouchableHighlight
+								activeOpacity={0}
+								underlayColor={COLORS.light}
+								onPress={() => setPickAddress(false)}
+							>
+								<Text style={{ ...FONTS.body3, color: COLORS.red }}>
+									Cancel
+								</Text>
+							</TouchableHighlight>
+							<TouchableHighlight
+								underlayColor={theme.SECONDARY_BUTTON_COLOR}
+								onPress={() => setPickAddress(false)}
+							>
+								<Text
+									style={{
+										...FONTS.h3,
+										color: theme.mode === 'dark' ? '#ffffff' : '#212121',
+									}}
+								>
+									Done
+								</Text>
+							</TouchableHighlight>
+						</View>
+						<View
+							style={{
+								flex: 1,
+								marginTop: 20,
+
+								width: '100%',
+								backgroundColor: theme.BACKGROUND_COLOR,
+							}}
+						>
+							<GoogleAutoComplete
+								label='Service Address'
+								onPress={(
+									data: GooglePlaceData,
+									details: GooglePlaceDetail
+								) => {
+									const { formatted_address } = details;
+									setAddress(
+										formatted_address.substring(0, formatted_address.length - 5)
+									);
+								}}
+							/>
+							{address !== '' && (
+								<InputField
+									placeholder='Apt, Unit, Suite'
+									value={apt!}
+									onChangeText={(text) => setApt(text.toUpperCase())}
+								/>
+							)}
+						</View>
+					</View>
+				</Overlay>
+			</Modal>
+		);
+	};
+
 	const handleAddRequest = async () => {
 		try {
 			const request: Request = {
@@ -84,7 +172,16 @@ const RequestServiceScreen: FC<Props> = ({ route, navigation }) => {
 				contractor: selectedContractor || undefined,
 				status: 'pending',
 				images: images,
+				apt: apt!,
+				serviceAddress: address,
 			};
+
+			if (!address) {
+				// 	@ts-ignore
+				alert('Please enter a service address');
+				setPickAddress(true);
+				return;
+			}
 
 			const saved = await dispatch(addRequest(request));
 
@@ -100,7 +197,7 @@ const RequestServiceScreen: FC<Props> = ({ route, navigation }) => {
 	const renderReviewOfRequestModal = (showIt: boolean) => {
 		if (showIt) {
 			return (
-				<Modal transparent animationType='slide' visible={showReview}>
+				<Modal animationType='slide' visible={showReview}>
 					<ScrollView
 						style={{ flex: 1 }}
 						contentContainerStyle={{
@@ -118,34 +215,37 @@ const RequestServiceScreen: FC<Props> = ({ route, navigation }) => {
 							}}
 						>
 							<View>
+								<TouchableOpacity
+									style={{
+										height: 40,
+										width: 40,
+										justifyContent: 'center',
+										alignItems: 'center',
+										borderRadius: 20,
+										marginBottom: 20,
+										backgroundColor: theme.ASCENT,
+									}}
+									onPress={() => setShowReview(false)}
+								>
+									<FontAwesome name='close' size={20} />
+								</TouchableOpacity>
+
 								<View>
-									<TouchableOpacity
-										style={{
-											height: 40,
-											width: 40,
-											justifyContent: 'center',
-											alignItems: 'center',
-											borderRadius: 20,
-											marginBottom: 20,
-											backgroundColor: theme.ASCENT,
-										}}
-										onPress={() => setShowReview(false)}
-									>
-										<FontAwesome name='close' size={20} />
-									</TouchableOpacity>
-								</View>
-								<View>
-									<Text style={{ ...FONTS.body2 }}>
+									<Text style={{ ...FONTS.body4 }}>
 										You are requesting services from {selectedContractor?.name}
 									</Text>
-									<Text style={{ ...FONTS.body2 }}>
+									<Text style={{ ...FONTS.body4 }}>
 										The type of job you are requesting is for{' '}
 										{selectedService!.name!.toUpperCase()} and you want this
 										service to start on {moment(serviceDate).format('ll')}{' '}
 										between {selectedHours}
 									</Text>
-									<Text style={{ ...FONTS.body2 }}>
+									<Text style={{ ...FONTS.body4 }}>
 										Your preferred method of contact is by {contactMethod}
+									</Text>
+									<Text style={{ ...FONTS.body4 }}>
+										The service address is {address}{' '}
+										{apt && `and apt/unit # is ${apt}`}
 									</Text>
 									{images.length > 0 ? (
 										<>
@@ -342,7 +442,36 @@ const RequestServiceScreen: FC<Props> = ({ route, navigation }) => {
 						</>
 					) : null}
 				</View>
+
 				<Divider large />
+				<View
+					style={{
+						paddingHorizontal: 10,
+
+						alignItems: 'center',
+						justifyContent: 'space-between',
+					}}
+				>
+					<Text>Service Address:</Text>
+					<TouchableOpacity
+						onPress={() => setPickAddress(true)}
+						style={{
+							alignItems: 'center',
+							justifyContent: 'center',
+							backgroundColor: theme.SECONDARY_BUTTON_COLOR,
+							paddingHorizontal: 10,
+							paddingVertical: 10,
+							borderRadius: SIZES.radius,
+							width: '100%',
+						}}
+					>
+						<Text center>{address ? address : 'Enter Address'}</Text>
+					</TouchableOpacity>
+				</View>
+				<View style={{ padding: 10 }}>
+					{apt && <Text bold>Apt, Unit, Suite: {apt}</Text>}
+				</View>
+
 				{/* PREFERRED CONTACT METHOD */}
 				<PrefferedContactMethodView>
 					<View>
@@ -494,6 +623,12 @@ const RequestServiceScreen: FC<Props> = ({ route, navigation }) => {
 
 								return;
 							}
+							if (!address) {
+								// @ts-ignore
+								alert('Pleaser enter a service address');
+
+								return;
+							}
 							if (description.length < 10) {
 								Alert.alert(
 									'Error',
@@ -513,8 +648,9 @@ const RequestServiceScreen: FC<Props> = ({ route, navigation }) => {
 						<Text title>Send Request</Text>
 					</SubmitRequestButton>
 				</View>
-				{renderReviewOfRequestModal(showReview)}
 			</KeyboardAwareScrollView>
+			{renderAddressModal()}
+			{renderReviewOfRequestModal(showReview)}
 
 			<Modal visible={viewImage} animationType='slide'>
 				<Screen>
@@ -600,4 +736,9 @@ const SubmitRequestButton = styled.TouchableOpacity`
 	width: 60%;
 	border-radius: 15px;
 	margin: 15px 2px;
+`;
+
+const Overlay = styled.View`
+	flex: 1;
+	background-color: rgba(14, 13, 13, 0.733);
 `;

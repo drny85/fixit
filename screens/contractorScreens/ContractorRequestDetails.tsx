@@ -15,7 +15,6 @@ import {
 import CheckBoxItem from '../../components/CheckBoxItem';
 import EmailLink from '../../components/EmailLink';
 import ImagesContainer from '../../components/ImagesContainer';
-import LogItem from '../../components/LogItem';
 import SwipableItem from '../../components/SwipableItem';
 import { SIZES } from '../../constants';
 import { Contractor } from '../../constants/Contractors';
@@ -142,7 +141,7 @@ const ContractorRequestDetails: FC<Props> = ({ navigation, route }) => {
 				</View>
 
 				<Text capitalize>Contact Method: {request?.contactMethod}</Text>
-				<Text>Address: {request?.customer?.address}</Text>
+				<Text>Address: {request?.serviceAddress}</Text>
 			</View>
 		);
 	};

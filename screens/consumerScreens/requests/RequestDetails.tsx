@@ -175,6 +175,8 @@ const RequestDetails: FC<Props> = ({ navigation, route }) => {
 						Service Request for: {moment(request?.serviceDate).format('ll')}
 					</Text>
 					<Text>Time / Window: {request?.serviceTime}</Text>
+					<Text>Address: {request?.serviceAddress}</Text>
+					{request?.apt && <Text>Apt / Unit: {request.apt}</Text>}
 					<Divider large />
 					{renderContractorInfo(request!)}
 					<Divider large />

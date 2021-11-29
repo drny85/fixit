@@ -1,14 +1,18 @@
-import axios from 'axios';
 import React, { FC } from 'react';
-import { View } from 'react-native';
+import { useNavigation } from '@react-navigation/core';
 import styled from 'styled-components/native';
 import { Button, Loader, Screen, Text } from '../../components';
 import { functions } from '../../firebase';
 import useContractors from '../../hooks/useContractors';
 import useNotifications from '../../hooks/useNotifications';
+import { AdminTabParamList } from '../../types';
+import { NativeStackScreenProps } from '@react-navigation/native-stack';
 
-const Dashboard: FC = () => {
+type Props = NativeStackScreenProps<AdminTabParamList, 'Dashboard'>;
+
+const Dashboard: FC<Props> = ({ navigation }) => {
 	useNotifications();
+
 	const { users, loading } = useContractors();
 
 	if (loading) return <Loader />;
@@ -25,6 +29,12 @@ const Dashboard: FC = () => {
 	return (
 		<Screen center>
 			<Text>Admin Dashboard</Text>
+			<DashboardCard
+				onPress={() => navigation.navigate('ContractorsDashboard')}
+			>
+				<Text>New Applicants</Text>
+				<Text>{users.filter((u) => u.isActive === false).length}</Text>
+			</DashboardCard>
 			<Button onPress={makeUserAContractor}>
 				<Text>Make Admin</Text>
 			</Button>
@@ -41,4 +51,13 @@ const NewContractorView = styled.View`
 	background-color: ${({ theme }) => theme.PRIMARY_BUTTON_COLOR};
 	margin: 5px 10px;
 	border-radius: 15px;
+`;
+
+const DashboardCard = styled.TouchableOpacity`
+	justify-content: space-between;
+	align-items: center;
+	flex-direction: row;
+	padding: 10px 15px;
+	border-radius: 15px;
+	background-color: ${({ theme }) => theme.SECONDARY_BUTTON_COLOR};
 `;

@@ -1,7 +1,11 @@
 const functions = require('firebase-functions');
 const admin = require('firebase-admin');
+require('dotenv').config();
 const { HttpsError } = require('firebase-functions/v1/https');
 const fetch = require('node-fetch');
+const stripe = require('stripe')(process.env.STRIPE_PK);
+
+console.log(process.env.STRIPE_PK);
 
 admin.initializeApp();
 
@@ -39,7 +43,7 @@ exports.sendNotificationOnSignUp = functions.firestore
 				}),
 			});
 		} catch (error) {
-			return HttpsError(`Error ${error}`);
+			return new HttpsError(`Error ${error}`);
 		}
 	});
 
@@ -68,7 +72,7 @@ exports.sendNotificationOnNewRequest = functions.firestore
 				}),
 			});
 		} catch (error) {
-			return HttpsError(`Error ${error}`);
+			return new HttpsError(`Error ${error}`);
 		}
 	});
 
@@ -90,7 +94,7 @@ exports.makeUserAContractor = functions.https.onCall(async (data, context) => {
 				.set({ isActive: true, activatedOn: Date.now() }, { merge: true });
 		});
 	} catch (error) {
-		return error;
+		return new HttpsError(error);
 	}
 });
 
@@ -106,13 +110,13 @@ exports.makeMeAdmin = functions.auth.user().onCreate(async (user) => {
 			});
 		} else {
 			if (user.email) {
-				admin.auth().setCustomUserClaims(user.uid, {
+				return admin.auth().setCustomUserClaims(user.uid, {
 					role: 'consumer',
 				});
 			}
 		}
 	} catch (error) {
-		return error;
+		return new HttpsError(error);
 	}
 });
 
@@ -131,3 +135,27 @@ async function activateContractor(email, user) {
 		role: 'contractor',
 	});
 }
+
+exports.createStripeCustomer = functions.firestore
+	.document('/users/{userId}')
+	.onWrite(async (change, context) => {
+		try {
+			const data = change.after.data();
+			if (data === null) {
+				return null;
+			}
+			const email = data.email;
+			const name = data.name;
+			const customer = await stripe.customers.create({
+				email: email,
+				name: name,
+			});
+			await admin
+				.firestore()
+				.collection('stripe_customers')
+				.doc(context.params.userId)
+				.set({ customer_id: customer.id });
+		} catch (error) {
+			return new HttpsError(error);
+		}
+	});

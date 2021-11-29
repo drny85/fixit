@@ -32,7 +32,6 @@ const LoginScreen: FC<Props> = ({ navigation }) => {
 	const [email, setEmail] = useState<string>('');
 	const [password, setPassword] = useState<string>('');
 	const theme = useAppSelector((state) => state.theme);
-	const { user } = useAppSelector((state) => state.auth);
 	const dispatch = useAppDispatch();
 	const [emailError, setEmailError] = useState('');
 	const [passwordError, setPasswordError] = useState('');
@@ -68,7 +67,13 @@ const LoginScreen: FC<Props> = ({ navigation }) => {
 				Alert.alert(
 					'Email not Verified',
 					'You must verify your email first. \n Please check your email',
-					[{ text: 'Ok', style: 'cancel' }]
+					[
+						{ text: 'Ok', style: 'cancel' },
+						{
+							text: 'Resend Link',
+							onPress: () => user?.sendEmailVerification(),
+						},
+					]
 				);
 				return;
 			} else {
@@ -94,7 +99,7 @@ const LoginScreen: FC<Props> = ({ navigation }) => {
 								{
 									text: 'Check Status',
 									onPress: () =>
-										navigation.replace('SignupStatus', {
+										navigation.navigate('SignupStatus', {
 											contractor: { id: res.id, ...res.data() } as Contractor,
 										}),
 								},
@@ -114,8 +119,6 @@ const LoginScreen: FC<Props> = ({ navigation }) => {
 			setLoading(false);
 		}
 	};
-
-	if (user) return null;
 
 	if (loading) return <Loader />;
 	return (
