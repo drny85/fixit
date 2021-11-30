@@ -5,6 +5,7 @@ export const STATUS: RequestStatus[] = [
 	'under review',
 	'accepted',
 	'approved',
+	'waiting for payment',
 	'declided',
 	'completed',
 ];

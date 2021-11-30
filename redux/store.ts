@@ -9,6 +9,7 @@ import requestSlide from './requestReducer/requestSlide';
 import contractorsSlide from './contractorReducer/contractorsSlide';
 import applicantsSlide from './applicantsReducer/applicantsSlide';
 import reviewsSlide from './reviewsRedu/reviewsSlide';
+import logsSlide from './logsReducer/logsSlide';
 
 const reducer = {
 	auth: authSlider,
@@ -18,6 +19,7 @@ const reducer = {
 	requests: requestSlide,
 	applicants: applicantsSlide,
 	reviews: reviewsSlide,
+	logs: logsSlide,
 };
 
 const store = configureStore({

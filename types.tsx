@@ -73,6 +73,7 @@ export type RequestStatus =
 	| 'working on'
 	| 'completed'
 	| 'declided'
+	| 'waiting for payment'
 	| undefined;
 
 export type SettingsTabParamList = {
@@ -89,6 +90,7 @@ export type AuthTabParamList = {
 export type RequestTabParamList = {
 	RequestScreen: undefined;
 	RequestDetails: { request?: Request };
+	PaymentBreakDown: { request?: Request };
 	ContractorScreen: { contractor: Contractor };
 	Home: undefined;
 };
@@ -122,8 +124,11 @@ export interface Theme {
 }
 
 export interface Log {
-	id: string;
+	id?: string;
 	requestId: string;
 	body: string;
+	cost: number | null;
 	loggedOn: string;
+	price_id?: string;
+	customer_id?: string;
 }

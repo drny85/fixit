@@ -3,6 +3,7 @@ import moment from 'moment';
 import React, { FC, useCallback, useEffect, useState } from 'react';
 import { TouchableWithoutFeedback, View } from 'react-native';
 import styled from 'styled-components/native';
+import * as Animatable from 'react-native-animatable';
 import {
 	Button,
 	Divider,
@@ -16,7 +17,7 @@ import CheckBoxItem from '../../components/CheckBoxItem';
 import EmailLink from '../../components/EmailLink';
 import ImagesContainer from '../../components/ImagesContainer';
 import SwipableItem from '../../components/SwipableItem';
-import { SIZES } from '../../constants';
+import { FONTS, SIZES } from '../../constants';
 import { Contractor } from '../../constants/Contractors';
 import { STATUS } from '../../constants/DispositonStatus';
 import 'react-native-get-random-values';
@@ -27,14 +28,20 @@ import {
 } from '../../redux/requestReducer/requestActions';
 import { useAppDispatch, useAppSelector } from '../../redux/store';
 import { Log, RequestStatus, RequestTabParamList } from '../../types';
+import { Switch } from 'react-native-elements';
+import { db } from '../../firebase';
+import { getLogsByRequestId } from '../../redux/logsReducer/logsSlide';
+import { addLog } from '../../redux/logsReducer/logsActions';
 
 type Props = NativeStackScreenProps<RequestTabParamList, 'RequestDetails'>;
 
 const ContractorRequestDetails: FC<Props> = ({ navigation, route }) => {
+	const { loading, logs } = useAppSelector((state) => state.logs);
 	const dispatch = useAppDispatch();
 	let rowRefs = new Map();
 	const [opened, setOpened] = useState<any>(null);
 	const [saving, setSaving] = useState<boolean>(false);
+	const [logCost, setLogCost] = useState<string>('');
 	const [viewImage, setViewImage] = useState<boolean>(false);
 	const [showLogModal, setShowLogModal] = useState<boolean>(false);
 	const [showEditModal, setShowEditModal] = useState<boolean>(false);
@@ -43,6 +50,7 @@ const ContractorRequestDetails: FC<Props> = ({ navigation, route }) => {
 	const { request } = useAppSelector((state) => state.requests);
 	const theme = useAppSelector((state) => state.theme);
 	const [log, setLog] = useState<string>('');
+	const [logHasPrice, setLogHasPrice] = useState<boolean>(false);
 	const [status, setStatus] = useState<RequestStatus>(undefined);
 
 	const handleStatusChange = async () => {
@@ -57,47 +65,59 @@ const ContractorRequestDetails: FC<Props> = ({ navigation, route }) => {
 			console.log(error);
 		}
 	};
+	console.log(logHasPrice, logCost);
 
 	const handleAddLog = useCallback(async () => {
 		try {
-			if (log === '') return;
+			if (log === '') {
+				// @ts-ignore
+				alert('Please type a description');
+				return;
+			}
+
+			if (logHasPrice && logCost === '') {
+				// @ts-ignore
+				alert('Please enter a log cost');
+				return;
+			}
+			if (!logCost && logCost === '') {
+				// @ts-ignore
+				alert('Fields Required');
+				return;
+			}
+			const price = logCost === '' ? 0 : +parseFloat(logCost).toFixed(2);
+
 			const logToSave: Log = {
-				id: nanoid(),
 				loggedOn: new Date().toISOString(),
 				body: log,
+				cost: price,
 				requestId: request?.id!,
 			};
 
-			const requestCopy = { ...request };
+			const saved = await addLog(logToSave);
+			if (saved) {
+				setSaving(true);
+				setLogCost('');
+				setLogHasPrice(false);
 
-			requestCopy.logs && requestCopy.logs.length > 0
-				? (requestCopy.logs = [logToSave, ...requestCopy.logs])
-				: (requestCopy.logs = [logToSave]);
-			setSaving(true);
+				setLog('');
 
-			dispatch(updateRequest(requestCopy as Request));
-			setLog('');
-
-			setShowLogModal(false);
+				setShowLogModal(false);
+			} else {
+				return;
+			}
 		} catch (error) {
 			console.log(error);
 		} finally {
 			setSaving(false);
 		}
-	}, [dispatch, log]);
+	}, [dispatch, log, logCost]);
 
 	const handleDeleteLog = useCallback(
 		async (log: Log) => {
 			try {
-				console.log(log);
 				const requestCopy = { ...request };
 
-				const data =
-					requestCopy.logs &&
-					requestCopy.logs?.filter(
-						(l) => l.loggedOn !== log.loggedOn && log.body !== l.body
-					);
-				requestCopy.logs = data;
 				setSaving(true);
 
 				dispatch(updateRequest(requestCopy as Request));
@@ -168,6 +188,39 @@ const ContractorRequestDetails: FC<Props> = ({ navigation, route }) => {
 							onChangeText={setLog}
 						/>
 					</View>
+					<View
+						style={{
+							justifyContent: 'center',
+							alignItems: 'center',
+							flexDirection: 'row',
+							paddingVertical: SIZES.padding * 0.5,
+						}}
+					>
+						<Switch
+							thumbColor={theme.PRIMARY_BUTTON_COLOR}
+							color={theme.ASCENT}
+							onValueChange={() => {
+								setLogHasPrice((s) => !s);
+							}}
+							value={logHasPrice}
+						/>
+						<Text bold>Has a cost?</Text>
+					</View>
+					{logHasPrice && (
+						<Animatable.View
+							style={{ width: '100%' }}
+							animation={logHasPrice ? 'slideInDown' : 'slideOutUp'}
+							easing='ease-in-out'
+						>
+							<InputField
+								leftIcon={<Text>$</Text>}
+								placeholder='Enter a cost for this log'
+								value={logCost}
+								keyboardType='numeric'
+								onChangeText={(text) => setLogCost(text)}
+							/>
+						</Animatable.View>
+					)}
 					<Button onPress={handleAddLog}>
 						<Text> {saving ? 'Saving...' : 'Save Log'}</Text>
 					</Button>
@@ -175,6 +228,7 @@ const ContractorRequestDetails: FC<Props> = ({ navigation, route }) => {
 			</Overlay>
 		</LogModal>
 	);
+
 	const renderEditModal = (): JSX.Element => (
 		<EditModal
 			visible={showEditModal}
@@ -216,7 +270,21 @@ const ContractorRequestDetails: FC<Props> = ({ navigation, route }) => {
 	);
 
 	useEffect(() => {
-		setStatus(request?.status!);
+		setStatus(request?.status);
+
+		const logsSub = db
+			.collection('logs')
+			.doc(request?.id)
+			.collection('logs')
+			.onSnapshot((snap) => {
+				dispatch(
+					getLogsByRequestId(
+						snap.docs.map((doc) => ({ id: doc.id, ...doc.data() }))
+					)
+				);
+			});
+
+		return logsSub;
 	}, [request?.status]);
 
 	return (
@@ -289,9 +357,7 @@ const ContractorRequestDetails: FC<Props> = ({ navigation, route }) => {
 					<LogsContainer>
 						<Divider large />
 						<Header
-							title={`Job Logs (${
-								request?.logs?.length ? request.logs.length : 0
-							})`}
+							title={`Job Logs (${logs?.length ? logs.length : 0})`}
 							onPressRight={() => setShowLogModal(true)}
 							iconName='plus-square'
 						/>
@@ -299,9 +365,9 @@ const ContractorRequestDetails: FC<Props> = ({ navigation, route }) => {
 							showsVerticalScrollIndicator={false}
 							style={{ height: SIZES.width * 0.6, marginBottom: 20 }}
 						>
-							{request?.logs &&
-								request.logs.length > 0 &&
-								request.logs.map((l) => (
+							{logs &&
+								logs.length > 0 &&
+								logs.map((l) => (
 									<SwipableItem
 										key={l.id}
 										rigthStyle={{
@@ -337,6 +403,9 @@ const ContractorRequestDetails: FC<Props> = ({ navigation, route }) => {
 											}}
 										>
 											<Text bold>{l.body}</Text>
+											{l.cost! > 0 && (
+												<Text style={{ ...FONTS.body4 }}>Cost: ${l.cost}</Text>
+											)}
 											<Text caption right>
 												{moment(l.loggedOn).format('llll')}
 											</Text>

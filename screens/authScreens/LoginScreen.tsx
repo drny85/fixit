@@ -64,6 +64,7 @@ const LoginScreen: FC<Props> = ({ navigation }) => {
 			setLoading(true);
 			const { user } = await auth.signInWithEmailAndPassword(email, password);
 			if (!user?.emailVerified) {
+				console.log(user);
 				Alert.alert(
 					'Email not Verified',
 					'You must verify your email first. \n Please check your email',

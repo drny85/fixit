@@ -5,8 +5,6 @@ const { HttpsError } = require('firebase-functions/v1/https');
 const fetch = require('node-fetch');
 const stripe = require('stripe')(process.env.STRIPE_PK);
 
-console.log(process.env.STRIPE_PK);
-
 admin.initializeApp();
 
 exports.sendNotificationOnSignUp = functions.firestore
@@ -155,6 +153,52 @@ exports.createStripeCustomer = functions.firestore
 				.collection('stripe_customers')
 				.doc(context.params.userId)
 				.set({ customer_id: customer.id });
+		} catch (error) {
+			return new HttpsError(error);
+		}
+	});
+
+exports.createStripeInvoice = functions.firestore
+	.document('/logs/{requestId}/logs/{autoId}')
+	.onCreate(async (snap, context) => {
+		try {
+			const data = snap.data();
+			const cost = Math.round(data.cost * 100);
+			if (cost > 1) {
+				const productName = data.body;
+				const requestId = context.params.requestId;
+				const requestData = await admin
+					.firestore()
+					.collection('requests')
+					.doc(requestId)
+					.get();
+				const userId = await requestData.data().customer.id;
+				if (!userId) return null;
+				const stripeCustomerObject = await admin
+					.firestore()
+					.collection('stripe_customers')
+					.doc(userId)
+					.get();
+				const customer_id = await stripeCustomerObject.data().customer_id;
+				if (!customer_id) return new HttpsError('No customer_id found');
+				const product = await stripe.products.create({
+					name: productName.toUpperCase(),
+				});
+
+				const price = await stripe.prices.create({
+					product: product.id,
+					unit_amount: cost,
+					currency: 'usd',
+				});
+
+				return await snap.ref.set(
+					{
+						price_id: price.id,
+						customer_id: customer_id,
+					},
+					{ merge: true }
+				);
+			} else return null;
 		} catch (error) {
 			return new HttpsError(error);
 		}

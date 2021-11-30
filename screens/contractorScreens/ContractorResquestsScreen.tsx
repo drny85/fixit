@@ -5,6 +5,7 @@ import { Header, Loader, RequestItem, Screen, Text } from '../../components';
 import { SIZES } from '../../constants';
 
 import useRequests from '../../hooks/useRequests';
+import { logout } from '../../redux/authReducer/authActions';
 import {
 	Request,
 	updateRequest,
@@ -19,7 +20,7 @@ type Props = NativeStackScreenProps<
 >;
 
 const ContractorResquestsScreen: FC<Props> = ({ navigation }) => {
-	const { requests, loading, user } = useRequests();
+	const { requests, loading } = useRequests();
 	const dispatch = useAppDispatch();
 	const onAcceptRequest = async (request: Request) => {
 		try {
@@ -38,8 +39,6 @@ const ContractorResquestsScreen: FC<Props> = ({ navigation }) => {
 			}}
 		/>
 	);
-
-	useEffect(() => {}, []);
 
 	if (loading) return <Loader />;
 
@@ -61,7 +60,7 @@ const ContractorResquestsScreen: FC<Props> = ({ navigation }) => {
 					/>
 				)}
 			</View>
-			{requests.length === 0 && !loading && (
+			{requests.length === 0 && (
 				<View
 					style={{
 						flex: 1,

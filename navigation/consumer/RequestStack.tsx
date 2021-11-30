@@ -6,6 +6,7 @@ import {
 	RequestsScreen,
 } from '../../screens';
 import { RequestTabParamList } from '../../types';
+import PaymentBreakdown from '../../screens/consumerScreens/requests/PaymentBreakdown';
 
 const { Navigator, Screen } = createNativeStackNavigator<RequestTabParamList>();
 
@@ -25,6 +26,11 @@ const RequestStack: FC = () => {
 			<Screen
 				name='ContractorScreen'
 				component={ContractorScreen}
+				options={{ headerShown: false }}
+			/>
+			<Screen
+				name='PaymentBreakDown'
+				component={PaymentBreakdown}
 				options={{ headerShown: false }}
 			/>
 		</Navigator>

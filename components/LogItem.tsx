@@ -51,6 +51,8 @@ const LogItem: FC<Props> = React.forwardRef(
 				</Animated.View>
 			);
 		};
+		console.log('LOG', log);
+
 		return (
 			<Swipeable
 				overshootRight={false}
@@ -72,7 +74,8 @@ const LogItem: FC<Props> = React.forwardRef(
 						borderRadius: SIZES.radius,
 					}}
 				>
-					<Text bold>{log.body}</Text>
+					<Text bold>{log.body} ...</Text>
+					<Text bold>Cost: ${log.cost}</Text>
 					<Text caption right>
 						{moment(log.loggedOn).format('llll')}
 					</Text>

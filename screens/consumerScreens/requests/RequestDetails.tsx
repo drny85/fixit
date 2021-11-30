@@ -11,6 +11,7 @@ import {
 	Screen,
 	Text,
 } from '../../../components';
+import FloatingButton from '../../../components/FloatingButton';
 import ImagesContainer from '../../../components/ImagesContainer';
 import ReviewModal from '../../../components/ReviewModal';
 import { SIZES } from '../../../constants';
@@ -209,6 +210,13 @@ const RequestDetails: FC<Props> = ({ navigation, route }) => {
 				onFinishRating={onFinishRating}
 				setComment={(text) => setReview(text)}
 			/>
+			{request?.status === 'waiting for payment' && (
+				<FloatingButton
+					onPress={() =>
+						navigation.navigate('PaymentBreakDown', { request: request })
+					}
+				/>
+			)}
 		</Screen>
 	);
 };

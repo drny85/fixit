@@ -17,13 +17,13 @@ export interface Request {
 	dateCompleted?: string | null;
 	serviceTime: string;
 	apt: string | null;
-	logs?: Log[];
 	status:
 		| 'under review'
 		| 'accepted'
 		| 'pending'
 		| 'approved'
 		| 'working on'
+		| 'waiting for payment'
 		| 'completed'
 		| 'declided';
 	contactMethod: 'phone' | 'email';

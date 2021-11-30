@@ -30,7 +30,7 @@ const RequestItem: FC<Props> = ({ request, onPress, onAcceptRequest }) => {
 					Request for {request!.service?.name}
 				</Text>
 				<Divider style={{ backgroundColor: '#ffffff' }} large />
-				<Text capitalize large>
+				<Text capitalize bold>
 					Status: {request.status}
 				</Text>
 				<Text>Job Date: {moment(request.serviceDate).format('ll')}</Text>
