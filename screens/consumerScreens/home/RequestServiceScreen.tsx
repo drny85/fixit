@@ -176,13 +176,6 @@ const RequestServiceScreen: FC<Props> = ({ route, navigation }) => {
 				serviceAddress: address,
 			};
 
-			if (!address) {
-				// 	@ts-ignore
-				alert('Please enter a service address');
-				setPickAddress(true);
-				return;
-			}
-
 			const saved = await dispatch(addRequest(request));
 
 			if (saved) {
@@ -616,6 +609,12 @@ const RequestServiceScreen: FC<Props> = ({ route, navigation }) => {
 				<View>
 					<SubmitRequestButton
 						onPress={() => {
+							if (!address) {
+								// @ts-ignore
+								alert('Pleaser enter a service address');
+
+								return;
+							}
 							if (selectedHours === '') {
 								Alert.alert('Error', 'Please select and time / window', [
 									{ text: 'OK', onPress: () => setHoursPicker(true) },
@@ -623,12 +622,7 @@ const RequestServiceScreen: FC<Props> = ({ route, navigation }) => {
 
 								return;
 							}
-							if (!address) {
-								// @ts-ignore
-								alert('Pleaser enter a service address');
 
-								return;
-							}
 							if (description.length < 10) {
 								Alert.alert(
 									'Error',

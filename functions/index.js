@@ -3,7 +3,8 @@ const admin = require('firebase-admin');
 require('dotenv').config();
 const { HttpsError } = require('firebase-functions/v1/https');
 const fetch = require('node-fetch');
-const stripe = require('stripe')(process.env.STRIPE_PK);
+const Stripe = require('stripe');
+const stripe = Stripe(process.env.STRIPE_PK, { apiVersion: '2020-08-27' });
 
 admin.initializeApp();
 
@@ -41,7 +42,7 @@ exports.sendNotificationOnSignUp = functions.firestore
 				}),
 			});
 		} catch (error) {
-			return new HttpsError(`Error ${error}`);
+			throw new HttpsError(`Error ${error}`);
 		}
 	});
 
@@ -70,7 +71,7 @@ exports.sendNotificationOnNewRequest = functions.firestore
 				}),
 			});
 		} catch (error) {
-			return new HttpsError(`Error ${error}`);
+			throw new HttpsError(`Error ${error}`);
 		}
 	});
 
@@ -92,7 +93,7 @@ exports.makeUserAContractor = functions.https.onCall(async (data, context) => {
 				.set({ isActive: true, activatedOn: Date.now() }, { merge: true });
 		});
 	} catch (error) {
-		return new HttpsError(error);
+		throw new HttpsError(error);
 	}
 });
 
@@ -114,7 +115,7 @@ exports.makeMeAdmin = functions.auth.user().onCreate(async (user) => {
 			}
 		}
 	} catch (error) {
-		return new HttpsError(error);
+		throw new HttpsError(error);
 	}
 });
 
@@ -154,7 +155,7 @@ exports.createStripeCustomer = functions.firestore
 				.doc(context.params.userId)
 				.set({ customer_id: customer.id });
 		} catch (error) {
-			return new HttpsError(error);
+			throw new HttpsError(error);
 		}
 	});
 
@@ -200,6 +201,64 @@ exports.createStripeInvoice = functions.firestore
 				);
 			} else return null;
 		} catch (error) {
-			return new HttpsError(error);
+			throw new HttpsError(error);
 		}
 	});
+
+exports.collectPayment = functions.https.onCall(async (data, context) => {
+	//data object expect a request object and requestUserId;
+	try {
+		const uid = context.auth.uid;
+		const email = context.auth.token.email;
+		const isVerified = context.auth.token.email_verified;
+		const cust = await (
+			await admin.firestore().collection('stripe_customers').doc(uid).get()
+		).data();
+		if (uid !== data.userId || !isVerified) {
+			throw new HttpsError('User not authorized');
+		}
+		const response = await admin
+			.firestore()
+			.collection('logs')
+			.doc(data.requestId)
+			.collection('logs')
+			.get();
+
+		const logs = response.docs.map((doc) => ({ id: doc.id, ...doc.data() }));
+
+		if (logs.length === 0) return null;
+
+		// const items = logs.map((i) => {
+		// 	if (i.price_id) {
+		// 		return { price: i.price_id, quantity: 1 };
+		// 	}
+		// });
+
+		const totalPrice = () =>
+			logs.reduce((acc, curr) => acc + curr.cost, 0).toFixed(2);
+
+		const ephemeralKey = await stripe.ephemeralKeys.create(
+			{ customer: cust.customer_id },
+			{ apiVersion: '2020-08-27' }
+		);
+
+		const paymentIntent = await stripe.paymentIntents.create({
+			payment_method_types: ['card'],
+			currency: 'usd',
+			amount: Math.round(totalPrice() * 100),
+			receipt_email: email,
+			customer: cust.customer_id,
+			metadata: {
+				requestId: data.requestId,
+			},
+		});
+
+		return {
+			paymentIntent: paymentIntent.client_secret,
+			ephemeralKey: ephemeralKey.secret,
+			customer: cust.customer_id,
+		};
+	} catch (error) {
+		throw new HttpsError(error);
+	}
+});

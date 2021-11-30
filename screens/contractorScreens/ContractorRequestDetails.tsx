@@ -31,7 +31,7 @@ import { Log, RequestStatus, RequestTabParamList } from '../../types';
 import { Switch } from 'react-native-elements';
 import { db } from '../../firebase';
 import { getLogsByRequestId } from '../../redux/logsReducer/logsSlide';
-import { addLog } from '../../redux/logsReducer/logsActions';
+import { addLog, deleteLog } from '../../redux/logsReducer/logsActions';
 
 type Props = NativeStackScreenProps<RequestTabParamList, 'RequestDetails'>;
 
@@ -55,6 +55,14 @@ const ContractorRequestDetails: FC<Props> = ({ navigation, route }) => {
 
 	const handleStatusChange = async () => {
 		try {
+			if (!logs.find((l) => l.cost! > 0)) {
+				// @ts-ignore
+				if (status === 'waiting for payment') {
+					alert('There is no charged for this request');
+					setStatus(request?.status);
+					return;
+				}
+			}
 			if (status !== undefined) {
 				const data = { ...request };
 				data.status = status;
@@ -80,11 +88,7 @@ const ContractorRequestDetails: FC<Props> = ({ navigation, route }) => {
 				alert('Please enter a log cost');
 				return;
 			}
-			if (!logCost && logCost === '') {
-				// @ts-ignore
-				alert('Fields Required');
-				return;
-			}
+
 			const price = logCost === '' ? 0 : +parseFloat(logCost).toFixed(2);
 
 			const logToSave: Log = {
@@ -116,16 +120,12 @@ const ContractorRequestDetails: FC<Props> = ({ navigation, route }) => {
 	const handleDeleteLog = useCallback(
 		async (log: Log) => {
 			try {
-				const requestCopy = { ...request };
-
 				setSaving(true);
-
-				dispatch(updateRequest(requestCopy as Request));
-				setLog('');
-
-				setShowLogModal(false);
-				console.log(opened);
-				//rowRefs.get(opened)?.closed();
+				const deleted = await deleteLog(log);
+				if (deleted) {
+					setLog('');
+					setShowLogModal(false);
+				}
 			} catch (error) {
 				console.log(error);
 			} finally {

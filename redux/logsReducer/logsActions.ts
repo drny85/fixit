@@ -11,3 +11,17 @@ export const addLog = async (log: Log): Promise<boolean> => {
 		return false;
 	}
 };
+
+export const deleteLog = async (log: Log) => {
+	try {
+		await db
+			.collection('logs')
+			.doc(log.requestId)
+			.collection('logs')
+			.doc(log.id)
+			.delete();
+		return true;
+	} catch (error) {
+		return false;
+	}
+};

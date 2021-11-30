@@ -91,6 +91,8 @@ export type RequestTabParamList = {
 	RequestScreen: undefined;
 	RequestDetails: { request?: Request };
 	PaymentBreakDown: { request?: Request };
+	PaymentScreen: { requestId: string };
+	PaymentSuccess: undefined;
 	ContractorScreen: { contractor: Contractor };
 	Home: undefined;
 };

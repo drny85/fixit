@@ -81,11 +81,11 @@ const useNotifications = () => {
 				}
 
 				if (finalStatus !== 'granted') {
-					Alert.alert(
-						'Error',
-						'Failed to get push token for push notification!',
-						[{ text: 'OK', style: 'cancel' }]
-					);
+					// Alert.alert(
+					// 	'Error',
+					// 	'Failed to get push token for push notification!',
+					// 	[{ text: 'OK', style: 'cancel' }]
+					// );
 					return;
 				}
 				const token = (await Notifications.getExpoPushTokenAsync()).data;

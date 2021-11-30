@@ -33,7 +33,7 @@ const RequestsScreen: FC<Props> = ({ navigation }) => {
 			<View style={{ flex: 1 }}>
 				{requests.length > 0 && !loading ? (
 					<FlatList
-						data={requests}
+						data={requests.filter((r) => r.customer?.id === user?.id)}
 						keyExtractor={(_, index) => index.toString()}
 						renderItem={renderItem}
 					/>
