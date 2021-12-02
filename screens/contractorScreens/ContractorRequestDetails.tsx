@@ -9,6 +9,7 @@ import {
 	Divider,
 	Header,
 	InputField,
+	Loader,
 	PhoneCall,
 	Screen,
 	Text,
@@ -20,8 +21,6 @@ import SwipableItem from '../../components/SwipableItem';
 import { FONTS, SIZES } from '../../constants';
 import { Contractor } from '../../constants/Contractors';
 import { STATUS } from '../../constants/DispositonStatus';
-import 'react-native-get-random-values';
-import { nanoid } from 'nanoid';
 import {
 	Request,
 	updateRequest,
@@ -29,7 +28,7 @@ import {
 import { useAppDispatch, useAppSelector } from '../../redux/store';
 import { Log, RequestStatus, RequestTabParamList } from '../../types';
 import { Switch } from 'react-native-elements';
-import { db } from '../../firebase';
+import { db, functions } from '../../firebase';
 import { getLogsByRequestId } from '../../redux/logsReducer/logsSlide';
 import { addLog, deleteLog } from '../../redux/logsReducer/logsActions';
 
@@ -53,12 +52,42 @@ const ContractorRequestDetails: FC<Props> = ({ navigation, route }) => {
 	const [logHasPrice, setLogHasPrice] = useState<boolean>(false);
 	const [status, setStatus] = useState<RequestStatus>(undefined);
 
+	const handleSendQuote = async () => {
+		try {
+			console.log('HERE');
+			setSaving(true);
+			if (!logs.find((l) => l.cost! > 0)) {
+				// @ts-ignore
+				alert('There is no charges for this request');
+				return;
+			}
+
+			const funcRef = await functions.httpsCallable('createQuote');
+			const { data } = await funcRef({ requestId: request?.id });
+			console.log(data);
+			if (data.success) {
+				const { id, customer, amount_total } = data.result;
+				console.log(id, customer, amount_total);
+				setSaving(false);
+				navigation.goBack();
+			} else {
+				setSaving(false);
+				console.log(data.result);
+			}
+		} catch (error) {
+			console.log(error);
+			setSaving(false);
+		} finally {
+			//setSaving(false);
+		}
+	};
+
 	const handleStatusChange = async () => {
 		try {
 			if (!logs.find((l) => l.cost! > 0)) {
 				// @ts-ignore
 				if (status === 'waiting for payment') {
-					alert('There is no charged for this request');
+					alert('There is no charges for this request');
 					setStatus(request?.status);
 					return;
 				}
@@ -73,7 +102,6 @@ const ContractorRequestDetails: FC<Props> = ({ navigation, route }) => {
 			console.log(error);
 		}
 	};
-	console.log(logHasPrice, logCost);
 
 	const handleAddLog = useCallback(async () => {
 		try {
@@ -269,6 +297,39 @@ const ContractorRequestDetails: FC<Props> = ({ navigation, route }) => {
 		</EditModal>
 	);
 
+	const renderSendQuoteButton = (logs: Log[]) => {
+		const totalPrice = () =>
+			logs.reduce((acc, curr) => acc + curr.cost!, 0).toFixed(2);
+
+		if (!logs.find((l) => l.cost! > 0)) return null;
+
+		return (
+			<>
+				<Divider />
+				<Button disabled={saving} onPress={handleSendQuote}>
+					<View
+						style={{
+							flexDirection: 'row',
+							justifyContent: 'center',
+							alignItems: 'center',
+						}}
+					>
+						{saving ? (
+							<Text>Sending quotes...</Text>
+						) : (
+							<>
+								<Text bold>Send Quote</Text>
+								<Text bold style={{ marginLeft: 8 }}>
+									${totalPrice()}
+								</Text>
+							</>
+						)}
+					</View>
+				</Button>
+			</>
+		);
+	};
+
 	useEffect(() => {
 		setStatus(request?.status);
 
@@ -345,6 +406,7 @@ const ContractorRequestDetails: FC<Props> = ({ navigation, route }) => {
 					</Text>
 					<Text>{request?.description}</Text>
 				</View>
+				{renderSendQuoteButton(logs)}
 				<View
 					style={{
 						flex: 1,

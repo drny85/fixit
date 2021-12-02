@@ -9,8 +9,7 @@ import { useAppDispatch, useAppSelector } from '../../../redux/store';
 const SettingsScreen: FC = () => {
 	const dispatch = useAppDispatch();
 	const { user } = useAppSelector((state) => state.auth);
-	const [name, setName] = useState<string>('');
-	const [error, setError] = useState<string>('invalid name');
+
 	const hanldeLogOut = async () => {
 		try {
 			Alert.alert('Loggin Out', 'Are you sure you want exit', [

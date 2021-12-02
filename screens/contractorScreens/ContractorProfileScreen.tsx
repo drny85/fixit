@@ -7,6 +7,7 @@ import { useAppDispatch, useAppSelector } from '../../redux/store';
 const ContractorProfileScreen = () => {
 	const { user } = useAppSelector((state) => state.auth);
 	const dispatch = useAppDispatch();
+
 	return (
 		<Screen>
 			<Header

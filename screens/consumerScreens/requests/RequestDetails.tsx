@@ -3,6 +3,11 @@ import moment from 'moment';
 import React, { FC, useCallback, useEffect, useState } from 'react';
 import { Alert, TouchableWithoutFeedback, View } from 'react-native';
 import styled from 'styled-components/native';
+import dayjs from 'dayjs';
+import local from 'dayjs/plugin/localizedFormat';
+dayjs().format();
+dayjs.extend(local);
+
 import {
 	Button,
 	Divider,
@@ -16,6 +21,7 @@ import ImagesContainer from '../../../components/ImagesContainer';
 import ReviewModal from '../../../components/ReviewModal';
 import { SIZES } from '../../../constants';
 import { Contractor, Review } from '../../../constants/Contractors';
+import { functions } from '../../../firebase';
 
 import { Request } from '../../../redux/requestReducer/requestActions';
 import {
@@ -44,6 +50,19 @@ const RequestDetails: FC<Props> = ({ navigation, route }) => {
 
 	const onFinishRating = (rating: number) => {
 		setRating(rating);
+	};
+
+	const handleAccepQuote = async () => {
+		const id = 'qt_1K1yd4DANJs8wHfHKwx3E9fZ';
+		const invoiceId = 'in_1K20BQDANJs8wHfH40JZD96B';
+		try {
+			const funref = await functions.httpsCallable('sendInvoice');
+			const { data } = await funref({ invoiceId });
+			// const { invoice, customer, amount_total } = data;
+			console.log(data);
+		} catch (error) {
+			console.log(error);
+		}
 	};
 
 	const alreadyReviewed = useCallback(() => {
@@ -196,6 +215,9 @@ const RequestDetails: FC<Props> = ({ navigation, route }) => {
 						Request Description
 					</Text>
 					<Text>{request?.description}</Text>
+					<Button onPress={handleAccepQuote}>
+						<Text>Accept</Text>
+					</Button>
 				</View>
 			</ViewContainer>
 			<ReviewModal

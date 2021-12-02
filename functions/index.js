@@ -1,10 +1,14 @@
 const functions = require('firebase-functions');
 const admin = require('firebase-admin');
 require('dotenv').config();
-const { HttpsError } = require('firebase-functions/v1/https');
+
 const fetch = require('node-fetch');
 const Stripe = require('stripe');
-const stripe = Stripe(process.env.STRIPE_PK, { apiVersion: '2020-08-27' });
+const stripeKey =
+	process.env.NODE_ENV === 'production'
+		? process.env.STRIPE_LIVE_SK
+		: process.env.STRIPE_PK;
+const stripe = Stripe(stripeKey, { apiVersion: '2020-08-27' });
 
 admin.initializeApp();
 
@@ -42,7 +46,7 @@ exports.sendNotificationOnSignUp = functions.firestore
 				}),
 			});
 		} catch (error) {
-			throw new HttpsError(`Error ${error}`);
+			throw new functions.https.HttpsError(`Error ${error}`);
 		}
 	});
 
@@ -71,7 +75,7 @@ exports.sendNotificationOnNewRequest = functions.firestore
 				}),
 			});
 		} catch (error) {
-			throw new HttpsError(`Error ${error}`);
+			throw new functions.https.HttpsError(`Error ${error}`);
 		}
 	});
 
@@ -82,7 +86,8 @@ exports.makeUserAContractor = functions.https.onCall(async (data, context) => {
 			console.log('TOKEN', context.auth.token);
 			return { result: 'Request not authorized' };
 		}
-		if (!data.email) return functions.https.HttpsError('not email provided');
+		if (!data.email)
+			return functions.https.functions.https.HttpsError('not email provided');
 		const user = await admin.auth().getUserByEmail(data.email);
 
 		return activateContractor(data.email, user).then(() => {
@@ -93,7 +98,7 @@ exports.makeUserAContractor = functions.https.onCall(async (data, context) => {
 				.set({ isActive: true, activatedOn: Date.now() }, { merge: true });
 		});
 	} catch (error) {
-		throw new HttpsError(error);
+		throw new functions.https.HttpsError(error);
 	}
 });
 
@@ -115,7 +120,7 @@ exports.makeMeAdmin = functions.auth.user().onCreate(async (user) => {
 			}
 		}
 	} catch (error) {
-		throw new HttpsError(error);
+		throw new functions.https.HttpsError(error);
 	}
 });
 
@@ -148,6 +153,7 @@ exports.createStripeCustomer = functions.firestore
 			const customer = await stripe.customers.create({
 				email: email,
 				name: name,
+				phone: data.phone,
 			});
 			await admin
 				.firestore()
@@ -155,7 +161,7 @@ exports.createStripeCustomer = functions.firestore
 				.doc(context.params.userId)
 				.set({ customer_id: customer.id });
 		} catch (error) {
-			throw new HttpsError(error);
+			throw new functions.https.HttpsError(error);
 		}
 	});
 
@@ -165,43 +171,48 @@ exports.createStripeInvoice = functions.firestore
 		try {
 			const data = snap.data();
 			const cost = Math.round(data.cost * 100);
-			if (cost > 1) {
-				const productName = data.body;
-				const requestId = context.params.requestId;
-				const requestData = await admin
-					.firestore()
-					.collection('requests')
-					.doc(requestId)
-					.get();
-				const userId = await requestData.data().customer.id;
-				if (!userId) return null;
-				const stripeCustomerObject = await admin
-					.firestore()
-					.collection('stripe_customers')
-					.doc(userId)
-					.get();
-				const customer_id = await stripeCustomerObject.data().customer_id;
-				if (!customer_id) return new HttpsError('No customer_id found');
-				const product = await stripe.products.create({
-					name: productName.toUpperCase(),
-				});
+			if (data.cost === 0) return null;
 
-				const price = await stripe.prices.create({
-					product: product.id,
-					unit_amount: cost,
-					currency: 'usd',
-				});
+			const productName = data.body;
+			const requestId = context.params.requestId;
+			const requestData = await admin
+				.firestore()
+				.collection('requests')
+				.doc(requestId)
+				.get();
+			const userId = await requestData.data().customer.id;
+			if (!userId) return null;
+			const stripeCustomerObject = await admin
+				.firestore()
+				.collection('stripe_customers')
+				.doc(userId)
+				.get();
+			const customer_id = await stripeCustomerObject.data().customer_id;
+			if (!customer_id)
+				return new functions.https.HttpsError('No customer_id found');
+			const product = await stripe.products.create({
+				name: productName.toUpperCase(),
+			});
 
-				return await snap.ref.set(
-					{
-						price_id: price.id,
-						customer_id: customer_id,
-					},
-					{ merge: true }
-				);
-			} else return null;
+			const price = await stripe.prices.create({
+				product: product.id,
+				unit_amount: cost,
+				tax_behavior: 'exclusive',
+				currency: 'usd',
+			});
+
+			await snap.ref.set(
+				{
+					price_id: price.id,
+					customer_id: customer_id,
+				},
+				{ merge: true }
+			);
+
+			return { success: true, result: 'successful' };
 		} catch (error) {
-			throw new HttpsError(error);
+			//throw new functions.https.HttpsError(error);
+			return { success: false, result: error.message };
 		}
 	});
 
@@ -215,16 +226,10 @@ exports.collectPayment = functions.https.onCall(async (data, context) => {
 			await admin.firestore().collection('stripe_customers').doc(uid).get()
 		).data();
 		if (uid !== data.userId || !isVerified) {
-			throw new HttpsError('User not authorized');
+			throw new functions.https.HttpsError('User not authorized');
 		}
-		const response = await admin
-			.firestore()
-			.collection('logs')
-			.doc(data.requestId)
-			.collection('logs')
-			.get();
 
-		const logs = response.docs.map((doc) => ({ id: doc.id, ...doc.data() }));
+		const logs = await getLogs(data.requestId);
 
 		if (logs.length === 0) return null;
 
@@ -233,6 +238,25 @@ exports.collectPayment = functions.https.onCall(async (data, context) => {
 		// 		return { price: i.price_id, quantity: 1 };
 		// 	}
 		// });
+
+		logs.map(async (log) => {
+			if (log.price_id) {
+				try {
+					await stripe.invoiceItems.create({
+						customer: log.customer_id,
+						price: log.price_id,
+					});
+				} catch (error) {
+					throw new functions.https.HttpsError(error);
+				}
+			}
+		});
+
+		const invoice = await stripe.invoices.create({
+			customer: cust.customer_id,
+			auto_advance: true, // Auto-finalize this draft after ~1 hour
+		});
+		console.log('INV_ID', invoice.id);
 
 		const totalPrice = () =>
 			logs.reduce((acc, curr) => acc + curr.cost, 0).toFixed(2);
@@ -253,12 +277,155 @@ exports.collectPayment = functions.https.onCall(async (data, context) => {
 			},
 		});
 
+		await stripe.invoices.sendInvoice(invoice.id);
+
 		return {
 			paymentIntent: paymentIntent.client_secret,
 			ephemeralKey: ephemeralKey.secret,
 			customer: cust.customer_id,
 		};
 	} catch (error) {
-		throw new HttpsError(error);
+		throw new functions.https.HttpsError(error);
 	}
 });
+
+exports.createQuote = functions.https.onCall(async (data, context) => {
+	try {
+		const admin = await isAuthorized(context.auth.token.email);
+		if (!admin) throw new functions.https.HttpsError('Not authorized');
+		const requestId = data.requestId;
+		const logs = await getLogs(requestId);
+		const address = await getRequestAddress(requestId);
+		const customer = logs[0].customer_id;
+		const formmatedAddress = address.split(', ');
+		const updatedCustomer = await stripe.customers.update(customer, {
+			address: {
+				line1: formmatedAddress[0],
+				city: formmatedAddress[1],
+				state: formmatedAddress[2].split(' ')[0],
+				postal_code: formmatedAddress[2].split(' ')[1],
+				country: 'US',
+			},
+		});
+
+		const line_items = logs.map((log) => ({ price: log.price_id }));
+		const quote = await stripe.quotes.create({
+			customer: updatedCustomer.id,
+			line_items,
+			metadata: {
+				requestId,
+				contractorId: context.auth.uid,
+				contractorEmail: context.auth.token.email,
+			},
+		});
+		const result = await stripe.quotes.finalizeQuote(quote.id);
+		await stripe.quotes.pdf(result.id);
+		const quoteInvoice = await stripe.quotes.accept(result.id);
+		const invoiceUpdated = await stripe.invoices.update(quoteInvoice.invoice, {
+			collection_method: 'send_invoice',
+			auto_advance: false,
+			days_until_due: 7,
+			automatic_tax: {
+				enabled: true,
+			},
+		});
+		const invoice = await stripe.invoices.sendInvoice(invoiceUpdated.id);
+		return { success: true, result: invoice, requestId };
+	} catch (error) {
+		//throw new functions.https.HttpsError('aborted', error.message);
+		return { success: false, result: error.message };
+	}
+});
+
+const getLogs = async (requestId) => {
+	try {
+		const logsData = await admin
+			.firestore()
+			.collection('logs')
+			.doc(requestId)
+			.collection('logs')
+			.get();
+
+		const results = logsData.docs
+			.map((doc) => ({ id: doc.id, ...doc.data() }))
+			.filter((log) => log.price_id !== undefined || log.price_id !== null);
+
+		if (results.length === 0)
+			throw new functions.https.HttpsError('not-found', 'there are not data');
+		return results;
+	} catch (error) {
+		throw new functions.https.HttpsError(error);
+	}
+};
+
+const isAuthorized = async (userEmail) => {
+	try {
+		const user = await admin.auth().getUserByEmail(userEmail);
+		return (
+			(user.customClaims && user.customClaims.role === 'contractor') ||
+			(user.customClaims && user.customClaims.role === 'admin')
+		);
+	} catch (error) {
+		throw new functions.https.HttpsError(error);
+	}
+};
+
+exports.acceptQuote = functions.https.onCall(async (data, context) => {
+	try {
+		if (!context.auth)
+			throw new functions.https.HttpsError(
+				'permission-denied',
+				'You are not authorized'
+			);
+		const quoteId = data.quoteId;
+		const quote = await stripe.quotes.accept(quoteId);
+		await stripe.invoices.update(quote.invoice, {
+			collection_method: 'send_invoice',
+			auto_advance: false,
+			days_until_due: 7,
+			automatic_tax: {
+				enabled: true,
+			},
+		});
+		return { success: true, result: quote };
+	} catch (error) {
+		//throw new functions.https.HttpsError(error);
+		return { success: false, result: error.message };
+	}
+});
+
+exports.sendInvoice = functions.https.onCall(async (data, context) => {
+	try {
+		const authorized = isAuthorized(context.auth.token.email);
+		if (!authorized)
+			throw new functions.https.HttpsError(
+				'permission-denied',
+				'not authorized'
+			);
+		if (!context.auth)
+			throw new functions.https.HttpsError(
+				'permission-denied',
+				'not authorized'
+			);
+
+		const invoiceId = data.invoiceId;
+		const invoice = await stripe.invoices.sendInvoice(invoiceId);
+		return { invoiceId: invoice.id, customer: invoice.customer };
+	} catch (error) {
+		throw new functions.https.HttpsError(error);
+	}
+});
+
+const getRequestAddress = async (requestId) => {
+	try {
+		const requestData = await admin
+			.firestore()
+			.collection('requests')
+			.doc(requestId)
+			.get();
+		const address = await requestData.data().serviceAddress;
+		return address;
+	} catch (error) {
+		throw new functions.https.HttpsError('not-found');
+	}
+};

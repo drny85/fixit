@@ -23,7 +23,7 @@ const SuccessScreen: FC<Props> = ({ navigation, route }) => {
 					style={{
 						justifyContent: 'center',
 						alignItems: 'center',
-						height: SIZES.height * 0.3,
+						height: SIZES.height * 0.2,
 					}}
 					source={require('../../../assets/animations/welldone.json')}
 					autoPlay
@@ -33,7 +33,7 @@ const SuccessScreen: FC<Props> = ({ navigation, route }) => {
 			<View
 				style={{
 					position: 'absolute',
-					top: SIZES.height * 0.3,
+					top: SIZES.height * 0.2,
 					padding: SIZES.padding,
 					left: 0,
 					right: 0,
@@ -58,7 +58,7 @@ const SuccessScreen: FC<Props> = ({ navigation, route }) => {
 			<View
 				style={{
 					position: 'absolute',
-					bottom: 50,
+					bottom: 0,
 					left: 0,
 					right: 0,
 					alignSelf: 'center',
@@ -84,6 +84,7 @@ const SubmitRequestButton = styled.TouchableOpacity`
 	background-color: ${({ theme }) => theme.ASCENT};
 	padding: 15px 30px;
 	justify-content: center;
+
 	align-items: center;
 	align-self: center;
 	width: 60%;

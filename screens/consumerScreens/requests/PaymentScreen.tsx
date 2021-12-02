@@ -18,7 +18,7 @@ type Props = NativeStackScreenProps<RequestTabParamList, 'PaymentScreen'>;
 const PaymentScreen: FC<Props> = ({ route, navigation }) => {
 	const { initPaymentSheet, presentPaymentSheet } = useStripe();
 	const { user } = useAppSelector((state) => state.auth);
-	const [proccessing, setProccessing] = useState<boolean>(false);
+	const [proccessing, setProccessing] = useState<boolean>(true);
 	const theme = useAppSelector((state) => state.theme);
 	const { isConnected, isInternetReachable } = useNetInfo();
 
@@ -73,8 +73,9 @@ const PaymentScreen: FC<Props> = ({ route, navigation }) => {
 	useEffect(() => {
 		if (isConnected && isInternetReachable) {
 			initializePaymentSheet();
+			setProccessing(false);
 		}
-	}, [isConnected, isInternetReachable]);
+	}, [isConnected, isInternetReachable, proccessing]);
 
 	if (!process.env.STRIPE_PUBLIC_KEY || proccessing) return <Loader />;
 	return (

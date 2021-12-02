@@ -1,4 +1,5 @@
 import React from 'react';
+import { View } from 'react-native';
 import styled from 'styled-components/native';
 
 import { Screen } from '.';
@@ -8,7 +9,9 @@ const Loader = () => {
 	const theme = useAppSelector((state) => state.theme);
 	return (
 		<Screen center>
-			<Indicator size='large' color={theme.PRIMARY_BUTTON_COLOR} />
+			<View style={{ flex: 1, justifyContent: 'center', alignItems: 'center' }}>
+				<Indicator size='large' color={theme.PRIMARY_BUTTON_COLOR} />
+			</View>
 		</Screen>
 	);
 };
