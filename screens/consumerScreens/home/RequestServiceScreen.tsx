@@ -51,7 +51,7 @@ const RequestServiceScreen: FC<Props> = ({ route, navigation }) => {
 	const scrollRef = useRef<any>();
 	const [selectedImage, setSelectedImage] = useState<string>('');
 	const [viewImage, setViewImage] = useState(false);
-	const [apt, setApt] = useState<string | null>(null);
+	const [apt, setApt] = useState<string>('');
 	const [hoursPicker, setHoursPicker] = useState(false);
 	const [pickAddress, setPickAddress] = useState(false);
 	const [selectedHours, setSelectedHours] = useState<string>('');
@@ -148,7 +148,9 @@ const RequestServiceScreen: FC<Props> = ({ route, navigation }) => {
 								<InputField
 									placeholder='Apt, Unit, Suite'
 									value={apt!}
-									onChangeText={(text) => setApt(text.toUpperCase())}
+									onChangeText={(text) =>
+										setApt(text.length > 0 ? text.toUpperCase() : '')
+									}
 								/>
 							)}
 						</View>
@@ -163,6 +165,7 @@ const RequestServiceScreen: FC<Props> = ({ route, navigation }) => {
 			const request: Request = {
 				userId: user?.id!,
 				description,
+				paid: false,
 				serviceDate: serviceDate.toISOString(),
 				receivedOn: new Date().toISOString(),
 				service: selectedService,
@@ -225,7 +228,9 @@ const RequestServiceScreen: FC<Props> = ({ route, navigation }) => {
 
 								<View>
 									<Text style={{ ...FONTS.body4 }}>
-										You are requesting services from {selectedContractor?.name}
+										You are requesting services from{' '}
+										{selectedContractor?.firstName}{' '}
+										{selectedContractor?.lastName}
 									</Text>
 									<Text style={{ ...FONTS.body4 }}>
 										The type of job you are requesting is for{' '}
@@ -380,7 +385,7 @@ const RequestServiceScreen: FC<Props> = ({ route, navigation }) => {
 						/>
 					</TouchableOpacity>
 					<Text capitalize center bold medium>
-						services from {selectedContractor && selectedContractor.name}
+						services from {selectedContractor && selectedContractor.firstName}
 					</Text>
 					<Text></Text>
 				</Header>
@@ -400,8 +405,8 @@ const RequestServiceScreen: FC<Props> = ({ route, navigation }) => {
 							<Divider large />
 							<SkillsView>
 								<Text caption center style={{ fontSize: 16 }}>
-									{selectedContractor?.name.split(' ')[0]} also does these
-									works, want to change?
+									{selectedContractor?.firstName} also does these works, want to
+									change?
 								</Text>
 								<View style={{ flexDirection: 'row', flexWrap: 'wrap' }}>
 									{selectedContractor &&
@@ -462,7 +467,7 @@ const RequestServiceScreen: FC<Props> = ({ route, navigation }) => {
 					</TouchableOpacity>
 				</View>
 				<View style={{ padding: 10 }}>
-					{apt && <Text bold>Apt, Unit, Suite: {apt}</Text>}
+					{apt !== '' && <Text bold>Apt, Unit, Suite: {apt}</Text>}
 				</View>
 
 				{/* PREFERRED CONTACT METHOD */}

@@ -27,6 +27,8 @@ const Screen: React.FC<{ style?: ViewStyle; center?: boolean }> = ({
 			<StatusBar style={theme.mode === 'dark' ? 'light' : 'auto'} />
 			<View
 				style={{
+					alignItems: center ? 'center' : undefined,
+					justifyContent: center ? 'center' : undefined,
 					maxWidth: SIZES.isSmallDevice ? SIZES.width : SIZES.width * 0.85,
 					alignSelf: SIZES.isSmallDevice ? 'auto' : 'center',
 					flex: 1,

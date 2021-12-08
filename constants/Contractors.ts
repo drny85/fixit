@@ -3,10 +3,13 @@ import { Service } from './Services';
 
 export interface Contractor {
 	id?: string;
-	name: string;
+	firstName: string;
+	lastName: string;
 	services: Service[];
 	phone: string;
 	email: string;
+	businessName?: string;
+	connectedAccountId: string | null;
 	isActive: boolean;
 	addedOn: string;
 	address?: string;

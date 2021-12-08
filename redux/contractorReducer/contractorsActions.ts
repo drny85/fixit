@@ -16,7 +16,7 @@ export const addContractor = async (
 		);
 
 		await user?.sendEmailVerification();
-		await user?.updateProfile({ displayName: contractor.name });
+		await user?.updateProfile({ displayName: contractor.firstName });
 
 		delete contractor.password;
 

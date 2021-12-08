@@ -15,15 +15,18 @@ import { NativeStackScreenProps } from '@react-navigation/native-stack';
 import { formatPhone } from '../../utils/formatPhone';
 import { SIZES } from '../../constants';
 import Layout from '../../constants/Layout';
-import { Feather } from '@expo/vector-icons';
+import { AntDesign, Feather } from '@expo/vector-icons';
 
 type Props = NativeStackScreenProps<AuthTabParamList, 'SignUpScreen'>;
 
 const SignUpScreen: FC<Props> = ({ navigation }) => {
 	const [email, setEmail] = useState<string>('');
 	const [phone, setPhone] = useState<string>('');
-	const [name, setName] = useState<string>('');
-	const [nameError, setNameError] = useState<string>('');
+
+	const [firstName, setFirstName] = useState<string>('');
+	const [lastName, setLastName] = useState<string>('');
+	const [firstNameError, setFirstNameError] = useState<string>('');
+	const [lastNameError, setLastNameError] = useState<string>('');
 	const [password, setPassword] = useState<string>('');
 	const [showPassword, setShowPassword] = useState<boolean>(false);
 	const [confirmPassword, setConfirmPassword] = useState<string>('');
@@ -39,10 +42,12 @@ const SignUpScreen: FC<Props> = ({ navigation }) => {
 	const handleSignUp = async () => {
 		try {
 			const userData: UserData = {
-				name,
+				firstName,
+				lastName,
 				phone,
 				email,
 				password,
+				connectedAccountId: null,
 				role: 'consumer',
 				imageUrl: null,
 				isActive: true,
@@ -57,8 +62,8 @@ const SignUpScreen: FC<Props> = ({ navigation }) => {
 			}
 
 			if (
-				name.length < 5 ||
-				name.trimEnd().split(' ').length < 2 ||
+				firstName.length < 3 ||
+				lastName.length < 3 ||
 				phone.length < 10 ||
 				!isEmailValid(email) ||
 				password.length < 6 ||
@@ -89,14 +94,22 @@ const SignUpScreen: FC<Props> = ({ navigation }) => {
 		}
 	};
 
-	const validateName = (value: string) => {
-		if (
-			(value.length < 5 && value.length > 2) ||
-			value.trimEnd().split(' ').length < 2
-		) {
-			setNameError('Please enter your full name');
+	const validateFirstName = (value: string) => {
+		if (value.length < 3) {
+			setFirstNameError('Please enter your first name');
+
+			return;
 		} else {
-			setNameError('');
+			setFirstNameError('');
+		}
+	};
+	const validateLastName = (value: string) => {
+		if (value.length < 3) {
+			setLastNameError('Please enter your last name');
+
+			return;
+		} else {
+			setLastNameError('');
 		}
 	};
 
@@ -156,15 +169,44 @@ const SignUpScreen: FC<Props> = ({ navigation }) => {
 						Sign Up
 					</Text>
 					<InputField
-						label='Full Name'
-						placeholder='John Smith'
+						label='First Name'
+						placeholder='John'
 						autoCapitalize='words'
 						onChangeText={(text) => {
-							validateName(text);
-							setName(text);
+							validateFirstName(text.trim());
+							setFirstName(text.trim());
 						}}
-						value={name}
-						errorMessage={nameError}
+						value={firstName}
+						rightIcon={
+							firstName.length >= 3 ? (
+								<AntDesign
+									name='checkcircle'
+									size={20}
+									color={theme.PRIMARY_BUTTON_COLOR}
+								/>
+							) : undefined
+						}
+						errorMessage={firstNameError}
+					/>
+					<InputField
+						label='Last Name'
+						placeholder='Smith'
+						autoCapitalize='words'
+						onChangeText={(text) => {
+							validateLastName(text.trim());
+							setLastName(text.trim());
+						}}
+						value={lastName}
+						rightIcon={
+							lastName.length >= 3 ? (
+								<AntDesign
+									name='checkcircle'
+									size={20}
+									color={theme.PRIMARY_BUTTON_COLOR}
+								/>
+							) : undefined
+						}
+						errorMessage={lastNameError}
 					/>
 					<InputField
 						label='Phone'
@@ -176,6 +218,15 @@ const SignUpScreen: FC<Props> = ({ navigation }) => {
 						}}
 						keyboardType='numeric'
 						value={phone}
+						rightIcon={
+							phone.length >= 10 ? (
+								<AntDesign
+									name='checkcircle'
+									size={20}
+									color={theme.PRIMARY_BUTTON_COLOR}
+								/>
+							) : undefined
+						}
 						errorMessage={phoneError}
 					/>
 					<InputField

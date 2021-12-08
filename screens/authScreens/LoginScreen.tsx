@@ -76,6 +76,7 @@ const LoginScreen: FC<Props> = ({ navigation }) => {
 						},
 					]
 				);
+				setLoading(false);
 				return;
 			} else {
 				if (user) {
@@ -106,6 +107,7 @@ const LoginScreen: FC<Props> = ({ navigation }) => {
 								},
 							]
 						);
+						setLoading(false);
 						return;
 					} else {
 						dispatch(setUserRole(role));
@@ -115,9 +117,8 @@ const LoginScreen: FC<Props> = ({ navigation }) => {
 			}
 		} catch (error: any) {
 			console.log(error.message);
-			Alert.alert('Error', error.message, [{ text: 'OK', style: 'cancel' }]);
-		} finally {
 			setLoading(false);
+			Alert.alert('Error', error.message, [{ text: 'OK', style: 'cancel' }]);
 		}
 	};
 

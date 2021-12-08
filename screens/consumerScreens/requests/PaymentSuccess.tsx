@@ -12,7 +12,7 @@ const PaymentSuccess: FC<Props> = ({ navigation }) => {
 		<Screen center>
 			<Text>Payment success</Text>
 
-			<Button onPress={() => navigation.replace('Home')}>
+			<Button onPress={() => navigation.navigate('Home')}>
 				<Text>Got It!</Text>
 			</Button>
 		</Screen>

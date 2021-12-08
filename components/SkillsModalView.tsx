@@ -1,4 +1,4 @@
-import React, { FC } from 'react';
+import React, { FC, useEffect, useState } from 'react';
 import {
 	View,
 	Modal,
@@ -10,8 +10,6 @@ import { CheckBox } from 'react-native-elements';
 import { Text } from '.';
 import { FONTS, SIZES } from '../constants';
 import { useAppSelector } from '../redux/store';
-import { Service } from '../constants/Services';
-import { setServicesSelected } from '../redux/servicesReducer/servicesSlide';
 import styled from 'styled-components/native';
 
 interface Props {

@@ -69,8 +69,12 @@ const ContractorByJob: FC<Props> = ({ route, navigation }) => {
 						alignItems: 'flex-start',
 					}}
 				>
-					<Text center>{item.name}</Text>
-					<Text center>{item.email}</Text>
+					<Text center>
+						{item.firstName} {item.lastName}
+					</Text>
+					<Text ellipsizeMode='tail' numberOfLines={1} center>
+						{item.email}
+					</Text>
 					<View
 						style={{
 							flexDirection: 'row',
@@ -80,12 +84,6 @@ const ContractorByJob: FC<Props> = ({ route, navigation }) => {
 						}}
 					>
 						<Text center>{item.phone}</Text>
-
-						{item.rating && (
-							<Text style={{ color: theme.ASCENT }} caption>
-								Rating {item.rating}
-							</Text>
-						)}
 					</View>
 				</View>
 				<View>

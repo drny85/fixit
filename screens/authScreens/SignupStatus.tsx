@@ -18,7 +18,7 @@ const SignupStatus: FC<Props> = ({ route, navigation }) => {
 	return (
 		<Screen>
 			<Header
-				title={contractor.name}
+				title={contractor.firstName}
 				onPressRight={handleLogout}
 				iconName='sign-out'
 			/>

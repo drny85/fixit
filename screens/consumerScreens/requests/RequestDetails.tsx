@@ -27,7 +27,7 @@ import { Request } from '../../../redux/requestReducer/requestActions';
 import {
 	addReview,
 	getReviewsByContractor,
-} from '../../../redux/reviewsRedu/reviewsAction';
+} from '../../../redux/reviewsReducer/reviewsAction';
 import { useAppDispatch, useAppSelector } from '../../../redux/store';
 import { RequestTabParamList } from '../../../types';
 
@@ -50,19 +50,6 @@ const RequestDetails: FC<Props> = ({ navigation, route }) => {
 
 	const onFinishRating = (rating: number) => {
 		setRating(rating);
-	};
-
-	const handleAccepQuote = async () => {
-		const id = 'qt_1K1yd4DANJs8wHfHKwx3E9fZ';
-		const invoiceId = 'in_1K20BQDANJs8wHfH40JZD96B';
-		try {
-			const funref = await functions.httpsCallable('sendInvoice');
-			const { data } = await funref({ invoiceId });
-			// const { invoice, customer, amount_total } = data;
-			console.log(data);
-		} catch (error) {
-			console.log(error);
-		}
 	};
 
 	const alreadyReviewed = useCallback(() => {
@@ -94,7 +81,7 @@ const RequestDetails: FC<Props> = ({ navigation, route }) => {
 			const reviewData: Review = {
 				addedOn: new Date().toISOString(),
 				body: review,
-				reviewer: { name: user?.name!, userId: user?.id! },
+				reviewer: { name: user?.firstName!, userId: user?.id! },
 				recommend: recommended!,
 				showName: anonymous,
 				contractorId: request?.contractor?.id!,
@@ -135,14 +122,20 @@ const RequestDetails: FC<Props> = ({ navigation, route }) => {
 						})
 					}
 				>
-					<Text bold>Full Name: {request?.contractor?.name}</Text>
+					<Text bold>
+						Full Name: {request?.contractor?.firstName}{' '}
+						{request?.contractor?.lastName}
+					</Text>
 				</TouchableWithoutFeedback>
 
 				<View style={{ flexDirection: 'row', alignItems: 'center' }}>
 					<Text>Phone: </Text>
 					<PhoneCall phone={request!.contractor!.phone} />
 				</View>
-				<Text>Contractor: {request?.contractor?.name}</Text>
+				<Text>
+					Contractor: {request?.contractor?.firstName}{' '}
+					{request?.contractor?.lastName}
+				</Text>
 			</View>
 		);
 	};
@@ -196,7 +189,7 @@ const RequestDetails: FC<Props> = ({ navigation, route }) => {
 					</Text>
 					<Text>Time / Window: {request?.serviceTime}</Text>
 					<Text>Address: {request?.serviceAddress}</Text>
-					{request?.apt && <Text>Apt / Unit: {request.apt}</Text>}
+					{request?.apt !== '' && <Text>Apt / Unit: {request?.apt}</Text>}
 					<Divider large />
 					{renderContractorInfo(request!)}
 					<Divider large />
@@ -215,9 +208,6 @@ const RequestDetails: FC<Props> = ({ navigation, route }) => {
 						Request Description
 					</Text>
 					<Text>{request?.description}</Text>
-					<Button onPress={handleAccepQuote}>
-						<Text>Accept</Text>
-					</Button>
 				</View>
 			</ViewContainer>
 			<ReviewModal
@@ -232,7 +222,7 @@ const RequestDetails: FC<Props> = ({ navigation, route }) => {
 				onFinishRating={onFinishRating}
 				setComment={(text) => setReview(text)}
 			/>
-			{request?.status === 'waiting for payment' && (
+			{request?.status === 'waiting for payment' && !request.paid && (
 				<FloatingButton
 					onPress={() =>
 						navigation.navigate('PaymentBreakDown', { request: request })

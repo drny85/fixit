@@ -22,7 +22,9 @@ const ContractorsDashboard: FC<Props> = ({ navigation }) => {
 					})
 				}
 			>
-				<Text>{item.name}</Text>
+				<Text>
+					{item.firstName} {item.lastName}
+				</Text>
 				<Entypo
 					name='chevron-right'
 					size={24}
@@ -38,7 +40,7 @@ const ContractorsDashboard: FC<Props> = ({ navigation }) => {
 			</Text>
 			{users.length > 0 && (
 				<FlatList
-					data={users}
+					data={users.filter((u) => !u.isActive)}
 					keyExtractor={(item, index) => index.toString()}
 					renderItem={renderItems}
 				/>

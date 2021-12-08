@@ -11,7 +11,7 @@ const ContractorProfileScreen = () => {
 	return (
 		<Screen>
 			<Header
-				title={user?.name}
+				title={user?.firstName + ' ' + user?.lastName}
 				iconName='sign-out'
 				onPressRight={() => dispatch(logout())}
 			/>

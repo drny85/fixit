@@ -8,7 +8,7 @@ import authSlider from './authReducer/authSlider';
 import requestSlide from './requestReducer/requestSlide';
 import contractorsSlide from './contractorReducer/contractorsSlide';
 import applicantsSlide from './applicantsReducer/applicantsSlide';
-import reviewsSlide from './reviewsRedu/reviewsSlide';
+import reviewsSlide from './reviewsReducer/reviewsSlide';
 import logsSlide from './logsReducer/logsSlide';
 
 const reducer = {

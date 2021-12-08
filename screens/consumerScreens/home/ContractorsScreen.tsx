@@ -1,8 +1,8 @@
 import { FontAwesome } from '@expo/vector-icons';
 import { NativeStackScreenProps } from '@react-navigation/native-stack';
-import React, { FC, useEffect, useState } from 'react';
+import React, { FC, useEffect } from 'react';
 import { ListRenderItem, View, FlatList } from 'react-native';
-import { Avatar, Rating } from 'react-native-elements';
+import { Avatar } from 'react-native-elements';
 import styled from 'styled-components/native';
 import { Divider, PhoneCall, Screen, Text } from '../../../components';
 import { statusBarHeight } from '../../../constants/Layout';
@@ -12,11 +12,8 @@ import { HomeTabParamList } from '../../../types';
 import moment from 'moment';
 import { db } from '../../../firebase';
 
-import { getReviewsByContractor } from '../../../redux/reviewsRedu/reviewsAction';
-import { login } from '../../../redux/authReducer/authActions';
 import { SIZES } from '../../../constants';
-import { getReviews } from '../../../redux/reviewsRedu/reviewsSlide';
-import { DocumentReference } from '@google-cloud/firestore';
+import { getReviews } from '../../../redux/reviewsReducer/reviewsSlide';
 
 type Props = NativeStackScreenProps<HomeTabParamList, 'ContractorScreen'>;
 
@@ -141,7 +138,7 @@ const ContractorScreen: FC<Props> = ({ route, navigation }) => {
 
 				<View>
 					<Text center title>
-						{contractor.name}
+						{contractor.firstName} {contractor.lastName}
 					</Text>
 					<View
 						style={{

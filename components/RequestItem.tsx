@@ -39,8 +39,10 @@ const RequestItem: FC<Props> = ({ request, onPress, onAcceptRequest }) => {
 				<Text>
 					{isContractor(request) ? 'Customer:' : 'Contractor'}{' '}
 					{isContractor(request)
-						? request.customer?.name
-						: request.contractor?.name}
+						? request.customer?.firstName + ' ' + request.customer?.lastName
+						: request.contractor?.firstName +
+						  ' ' +
+						  request.contractor?.lastName}
 				</Text>
 				{isContractor(request) && request.status === 'pending' && (
 					<ButtonContainer>

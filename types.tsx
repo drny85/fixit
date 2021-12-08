@@ -57,6 +57,7 @@ export type HomeTabParamList = {
 	ContractorScreen: { contractor: Contractor };
 	RequestServiceScreen: { contractor: Contractor };
 	SuccessScreen: undefined;
+	ConnectedAccountScreen: undefined;
 };
 
 export type AdminTabParamList = {

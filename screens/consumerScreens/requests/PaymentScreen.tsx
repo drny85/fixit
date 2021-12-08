@@ -8,7 +8,7 @@ import {
 	ConfirmPaymentSheetPaymentResult,
 } from '@stripe/stripe-react-native';
 import { useAppSelector } from '../../../redux/store';
-import { functions } from '../../../firebase';
+import { db, functions } from '../../../firebase';
 import { NativeStackScreenProps } from '@react-navigation/native-stack';
 import { RequestTabParamList } from '../../../types';
 import { useNetInfo } from '@react-native-community/netinfo';
@@ -24,16 +24,20 @@ const PaymentScreen: FC<Props> = ({ route, navigation }) => {
 
 	const initializePaymentSheet = async () => {
 		try {
-			const functionRef = functions.httpsCallable('collectPayment');
+			const functionRef = functions.httpsCallable('createPaymentIntent');
 			setProccessing(true);
-			const {
-				data: { customer, ephemeralKey, paymentIntent },
-			} = await functionRef({
+			const { data } = await functionRef({
 				requestId: route.params.requestId,
-				userId: user?.id,
 			});
 
 			// setCustomerId(customer);
+			console.log('DATA', data);
+			if (!data.success) {
+				alert('No data available');
+				return;
+			}
+			const { customer, ephemeralKey, paymentIntent, paymentId } = data.result;
+			console.log('Payment ID', paymentId);
 
 			// console.log(customer, paymentIntent, ephemeralKey);
 			const { error } = await initPaymentSheet({
@@ -45,10 +49,11 @@ const PaymentScreen: FC<Props> = ({ route, navigation }) => {
 			if (error) {
 				console.log('Error @', error);
 			} else {
+				setProccessing(false);
 				openPaymentSheet();
 			}
 		} catch (error) {
-			console.log(error);
+			console.log('E', error);
 		} finally {
 			setProccessing(false);
 		}
@@ -63,6 +68,14 @@ const PaymentScreen: FC<Props> = ({ route, navigation }) => {
 				Alert.alert(`${error.code}`, error.message);
 				return;
 			} else {
+				await db.collection('requests').doc(route.params.requestId).set(
+					{
+						paid: true,
+						paidOn: new Date().toISOString(),
+						status: 'completed',
+					},
+					{ merge: true }
+				);
 				navigation.replace('PaymentSuccess');
 			}
 		} catch (error) {
@@ -73,9 +86,9 @@ const PaymentScreen: FC<Props> = ({ route, navigation }) => {
 	useEffect(() => {
 		if (isConnected && isInternetReachable) {
 			initializePaymentSheet();
-			setProccessing(false);
+			//setProccessing(false);
 		}
-	}, [isConnected, isInternetReachable, proccessing]);
+	}, [isConnected, isInternetReachable]);
 
 	if (!process.env.STRIPE_PUBLIC_KEY || proccessing) return <Loader />;
 	return (
@@ -86,10 +99,7 @@ const PaymentScreen: FC<Props> = ({ route, navigation }) => {
 				backgroundColor: theme.BACKGROUND_COLOR,
 			}}
 		>
-			<Screen>
-				<Header canGoBack title='Payment' />
-				<Text>Payment Screen</Text>
-			</Screen>
+			<View></View>
 		</StripeProvider>
 	);
 };

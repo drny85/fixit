@@ -26,7 +26,10 @@ import { Contractor } from '../../constants/Contractors';
 import SkillsModalView from '../../components/SkillsModalView';
 import { Service } from '../../constants/Services';
 import { getServices } from '../../redux/servicesReducer/servicesActions';
-import { setServicesSelected } from '../../redux/servicesReducer/servicesSlide';
+import {
+	setSelectedService,
+	setServicesSelected,
+} from '../../redux/servicesReducer/servicesSlide';
 
 import {
 	addContractor,
@@ -41,23 +44,26 @@ type Props = NativeStackScreenProps<AuthTabParamList, 'SignUpAsContractor'>;
 const SignUpAsContractor: FC<Props> = ({ navigation }) => {
 	const [email, setEmail] = useState<string>('');
 	const [phone, setPhone] = useState<string>('');
-	const [name, setName] = useState<string>('');
+	const [firstName, setFirstName] = useState<string>('');
+	const [lastName, setLastName] = useState<string>('');
+	const [businessName, setBusinessName] = useState<string>('');
 	const [bio, setBio] = useState<string>('');
 	const [address, setAddress] = useState<string>('');
 	const [coords, setCoords] = useState<{ lat: number; lng: number } | null>(
 		null
 	);
-	const [nameError, setNameError] = useState<string>('');
+	const [firstNameError, setFirstNameError] = useState<string>('');
+	const [lastNameError, setLastNameError] = useState<string>('');
 	const { servicesSelected } = useAppSelector((state) => state.services);
 	const theme = useAppSelector((state) => state.theme);
 	const dispatch = useAppDispatch();
 	const [emailError, setEmailError] = useState<string>('');
+	const [businessNameError, setBusinessNameError] = useState<string>('');
 	const [phoneError, setPhoneError] = useState<string>('');
 	const [password, setPassword] = useState<string>('');
 	const [confirmPassword, setConfirmPassword] = useState<string>('');
 	const [passwordError, setPasswordError] = useState('');
 	const [passwordConfirmError, setPasswordConfirmError] = useState('');
-	const [confirmPasswordError, setConfirmPasswordError] = useState('');
 	const [visible, setVisible] = useState<boolean>(false);
 	const [showPassword, setShowPassword] = useState<boolean>(false);
 
@@ -84,14 +90,18 @@ const SignUpAsContractor: FC<Props> = ({ navigation }) => {
 
 	const handleSignUp = async () => {
 		try {
+			validateFirstName(firstName);
+			validateLastName(lastName);
+			validateBusinessName(businessName);
 			validateAddress();
 			validateJobs();
-			validateName(name);
+
 			validatePassword(password);
 			validateConfirmPassword(confirmPassword);
 
 			if (
-				name.length < 5 ||
+				firstName.length < 3 ||
+				businessName.length < 5 ||
 				address.length < 5 ||
 				phone.length < 10 ||
 				!isEmailValid(email) ||
@@ -105,14 +115,17 @@ const SignUpAsContractor: FC<Props> = ({ navigation }) => {
 			}
 
 			const userData: Contractor = {
-				name,
+				firstName,
+				lastName,
 				phone,
 				email: email.toLowerCase().trim(),
 				address,
 				coords,
+				businessName,
 				bio,
 				role: 'contractor',
 				imageUrl: null,
+				connectedAccountId: null,
 				password,
 				isActive: false,
 				services: servicesSelected,
@@ -139,13 +152,33 @@ const SignUpAsContractor: FC<Props> = ({ navigation }) => {
 		}
 	};
 
-	const validateName = (value: string) => {
-		if (value.length < 5 || value.trimEnd().split(' ').length < 2) {
-			setNameError('Please enter your full name');
+	const validateFirstName = (value: string) => {
+		if (value.length < 3) {
+			setFirstNameError('Please enter your first name');
 
 			return;
 		} else {
-			setNameError('');
+			setFirstNameError('');
+		}
+	};
+	const validateLastName = (value: string) => {
+		if (value.length < 3) {
+			setLastNameError('Please enter your last name');
+
+			return;
+		} else {
+			setLastNameError('');
+		}
+	};
+	const validateBusinessName = (value: string) => {
+		if (value.length < 5) {
+			setBusinessNameError(
+				'Please enter a name for your business, more than 5 characters long'
+			);
+
+			return;
+		} else {
+			setBusinessNameError('');
 		}
 	};
 
@@ -260,16 +293,16 @@ const SignUpAsContractor: FC<Props> = ({ navigation }) => {
 								Sign Up As Contractor
 							</Text>
 							<InputField
-								label='Full Name'
-								placeholder='John Smith'
+								label='First Name'
+								placeholder='John'
 								autoCapitalize='words'
 								onChangeText={(text) => {
-									validateName(text);
-									setName(text);
+									validateFirstName(text.trim());
+									setFirstName(text.trim());
 								}}
-								value={name}
+								value={firstName}
 								rightIcon={
-									name.length > 5 && name.trimEnd().split(' ').length >= 2 ? (
+									firstName.length >= 3 ? (
 										<AntDesign
 											name='checkcircle'
 											size={20}
@@ -277,7 +310,47 @@ const SignUpAsContractor: FC<Props> = ({ navigation }) => {
 										/>
 									) : undefined
 								}
-								errorMessage={nameError}
+								errorMessage={firstNameError}
+							/>
+							<InputField
+								label='Last Name'
+								placeholder='Smith'
+								autoCapitalize='words'
+								onChangeText={(text) => {
+									validateLastName(text.trim());
+									setLastName(text.trim());
+								}}
+								value={lastName}
+								rightIcon={
+									lastName.length >= 3 ? (
+										<AntDesign
+											name='checkcircle'
+											size={20}
+											color={theme.PRIMARY_BUTTON_COLOR}
+										/>
+									) : undefined
+								}
+								errorMessage={lastNameError}
+							/>
+							<InputField
+								label='Business Name'
+								placeholder='Johns Repair'
+								autoCapitalize='words'
+								onChangeText={(text) => {
+									validateBusinessName(text);
+									setBusinessName(text);
+								}}
+								value={businessName}
+								rightIcon={
+									businessName.length >= 5 ? (
+										<AntDesign
+											name='checkcircle'
+											size={20}
+											color={theme.PRIMARY_BUTTON_COLOR}
+										/>
+									) : undefined
+								}
+								errorMessage={businessNameError}
 							/>
 							<GoogleAutoComplete
 								label='Address'

@@ -20,7 +20,8 @@ const AdminContractorDetails: FC<Props> = ({ route }) => {
 		try {
 			const funcRef = functions.httpsCallable('makeUserAContractor');
 			if (!contrator?.email) return;
-			await funcRef({ email: contrator?.email });
+			const { data } = await funcRef({ email: contrator?.email });
+			console.log(data);
 		} catch (error) {
 			console.log(error);
 		}

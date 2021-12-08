@@ -17,6 +17,9 @@ export interface Request {
 	dateCompleted?: string | null;
 	serviceTime: string;
 	apt: string | null;
+	paid: boolean;
+	payment_intent_id?: string;
+	paidOn?: string;
 	status:
 		| 'under review'
 		| 'accepted'

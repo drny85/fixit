@@ -1,7 +1,7 @@
 {
   "functions": {
-    "predeploy": "npm --prefix \"$RESOURCE_DIR\" run",
-    "source": "functions"
+    "source": "functions",
+    "predeploy": "npm --prefix \"$RESOURCE_DIR\" run build"
   },
   "emulators": {
     "auth": {
@@ -15,6 +15,9 @@
     },
     "ui": {
       "enabled": true
+    },
+    "database": {
+      "port": null
     }
   }
 }

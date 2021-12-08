@@ -22,7 +22,6 @@ type Props = NativeStackScreenProps<HomeTabParamList, 'Home'>;
 const Home: FC<Props> = ({ navigation }) => {
 	const dispatch = useAppDispatch();
 	const { services, loading } = useAppSelector((state) => state.services);
-	const { error, user } = useAppSelector((state) => state.auth);
 	const theme = useAppSelector((state) => state.theme);
 
 	useNotifications();
@@ -63,6 +62,7 @@ const Home: FC<Props> = ({ navigation }) => {
 			.collection('users')
 			.where('role', '==', 'contractor')
 			.where('isActive', '==', true)
+			.where('connectedAccountId', '!=', null)
 			.onSnapshot((snapshop) => {
 				dispatch(
 					getContractors(

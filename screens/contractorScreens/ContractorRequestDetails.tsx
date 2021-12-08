@@ -62,9 +62,9 @@ const ContractorRequestDetails: FC<Props> = ({ navigation, route }) => {
 				return;
 			}
 
-			const funcRef = await functions.httpsCallable('createQuote');
+			const funcRef = await functions.httpsCallable('paymentIntent');
 			const { data } = await funcRef({ requestId: request?.id });
-			console.log(data);
+			console.log('DATA', data);
 			if (data.success) {
 				const { id, customer, amount_total } = data.result;
 				console.log(id, customer, amount_total);
@@ -72,7 +72,7 @@ const ContractorRequestDetails: FC<Props> = ({ navigation, route }) => {
 				navigation.goBack();
 			} else {
 				setSaving(false);
-				console.log(data.result);
+				console.log('Error', data.result);
 			}
 		} catch (error) {
 			console.log(error);
@@ -176,7 +176,10 @@ const ContractorRequestDetails: FC<Props> = ({ navigation, route }) => {
 						})
 					}
 				>
-					<Text bold>Full Name: {request?.customer?.name}</Text>
+					<Text bold>
+						Full Name: {request?.customer?.firstName}{' '}
+						{request?.customer?.lastName}
+					</Text>
 				</TouchableWithoutFeedback>
 
 				<View style={{ flexDirection: 'row', alignItems: 'center' }}>
