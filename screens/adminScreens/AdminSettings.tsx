@@ -2,13 +2,14 @@ import React from 'react';
 import { Alert, View } from 'react-native';
 import styled from 'styled-components/native';
 import { Screen, Text } from '../../components';
+import ListItemSetting from '../../components/ListItemSetting';
 import { logout } from '../../redux/authReducer/authActions';
 import { useAppDispatch, useAppSelector } from '../../redux/store';
 
 const AdminSettings = () => {
 	const { user } = useAppSelector((state) => state.auth);
 	const dispatch = useAppDispatch();
-
+	const theme = useAppSelector((state) => state.theme);
 	const hanldeLogOut = async () => {
 		try {
 			Alert.alert('Loggin Out', 'Are you sure you want exit', [
@@ -27,11 +28,23 @@ const AdminSettings = () => {
 		<Screen>
 			<Header>
 				<Text></Text>
-				<Text title>{user?.name}</Text>
+				<Text title>
+					{user?.firstName} {user?.lastName}
+				</Text>
 				<LogOut onPress={hanldeLogOut}>
 					<Text>Log Out</Text>
 				</LogOut>
 			</Header>
+			<View>
+				<ListItemSetting
+					title={'Add Services'}
+					onPress={() => {}}
+					containerStyle={{
+						shadowColor: theme.SHADOW_COLOR,
+						backgroundColor: theme.ASCENT,
+					}}
+				/>
+			</View>
 		</Screen>
 	);
 };

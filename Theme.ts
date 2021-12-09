@@ -10,7 +10,7 @@ export const lightTheme: DefaultTheme = {
 	SECONDARY_BUTTON_COLOR: '#370617',
 	DONE_COLOR: '#0b525b',
 	STATUS_BAR: 'dark',
-	ASCENT: '#50514f',
+	ASCENT: '#b08968',
 };
 
 export const darkTheme: DefaultTheme = {
@@ -23,5 +23,5 @@ export const darkTheme: DefaultTheme = {
 	SHADOW_COLOR: 'rgba(0, 0, 0, 0.19)',
 	SECONDARY_BUTTON_COLOR: '#370617',
 	STATUS_BAR: 'light',
-	ASCENT: '#50514f',
+	ASCENT: '#b08968',
 };

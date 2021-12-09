@@ -1,4 +1,4 @@
-import { RootTabParamList } from '../../types';
+import { AdminTabParamList, RootTabParamList } from '../../types';
 import React, { FC } from 'react';
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 
@@ -30,7 +30,7 @@ function TabBarIcon(props: {
 	);
 }
 
-const { Navigator, Screen } = createBottomTabNavigator();
+const { Navigator, Screen } = createBottomTabNavigator<AdminTabParamList>();
 
 const AdminTabsNavigation: FC = () => {
 	const theme = useAppSelector((state) => state.theme);
@@ -50,7 +50,7 @@ const AdminTabsNavigation: FC = () => {
 			}}
 		>
 			<Screen
-				name='AdminDashBoard'
+				name='Dashboard'
 				component={DashboardStack}
 				options={({ route }) => {
 					const routeName = getFocusedRouteNameFromRoute(route);
@@ -65,7 +65,7 @@ const AdminTabsNavigation: FC = () => {
 				}}
 			/>
 			<Screen
-				name='AdminContractors'
+				name='ContractorsDashboard'
 				component={AdminContractorStack}
 				options={{
 					title: 'Contractors',
@@ -73,7 +73,7 @@ const AdminTabsNavigation: FC = () => {
 				}}
 			/>
 			<Screen
-				name='AdminSettings'
+				name='AdminSettingsDashboard'
 				component={AdminSettings}
 				options={{
 					title: 'Settings',

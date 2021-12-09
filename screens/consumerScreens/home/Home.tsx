@@ -16,6 +16,7 @@ import { getServices } from '../../../redux/servicesReducer/servicesActions';
 import useNotifications from '../../../hooks/useNotifications';
 import { db } from '../../../firebase';
 import { SIZES } from '../../../constants';
+import useLocation from '../../../hooks/useLocation';
 
 type Props = NativeStackScreenProps<HomeTabParamList, 'Home'>;
 
@@ -25,6 +26,7 @@ const Home: FC<Props> = ({ navigation }) => {
 	const theme = useAppSelector((state) => state.theme);
 
 	useNotifications();
+	//const { location, errorMsg } = useLocation();
 
 	const navigateAndSetSelectedService = (service: Service) => {
 		dispatch(setSelectedService(service));

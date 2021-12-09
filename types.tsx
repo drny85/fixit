@@ -52,9 +52,24 @@ export type HomeTabParamList = {
 };
 
 export type AdminTabParamList = {
+	Dashboard: NavigatorScreenParams<DashboardStackParams> | undefined;
+	ContractorsDashboard:
+		| NavigatorScreenParams<ContractorsDashboardParams>
+		| undefined;
+	AdminSettingsDashboard:
+		| NavigatorScreenParams<AdminSettingsDashboardParams>
+		| undefined;
+};
+
+export type DashboardStackParams = {
 	Dashboard: undefined;
-	ContractorsDashboard: undefined;
-	AdminContractorDetails: { contratorId: string };
+};
+export type ContractorsDashboardParams = {
+	AdminContractorsDashboard: { contractorStatus: 'new' | 'active' | undefined };
+	AdminContractorDetails: { contractorId: string | undefined };
+};
+export type AdminSettingsDashboardParams = {
+	AdminSettingDashboard: undefined;
 };
 
 export type RequestStatus =
@@ -68,9 +83,6 @@ export type RequestStatus =
 	| 'waiting for payment'
 	| undefined;
 
-export type SettingsTabParamList = {
-	Profile: undefined;
-};
 export type AuthTabParamList = {
 	LoginScreen: undefined;
 	SignUpScreen: undefined;

@@ -20,13 +20,28 @@ export default ({ config }: ConfigContext): ExpoConfig => {
 		assetBundlePatterns: ['**/*'],
 		ios: {
 			supportsTablet: true,
-			infoPlist: {},
+			buildNumber: '1.0.0',
+			merchantId: 'net.robertdev.IwillFixIt',
+			bundleIdentifier: 'net.robertdev.IwillFixIt',
+			infoPlist: {
+				NSCameraUsageDescription:
+					'We need access to your camera so you can take pictures.',
+				NSPhotoLibraryUsageDescription:
+					'We need access to your photo library for you to select pictures',
+				NSLocationWhenInUseUsageDescription:
+					'We need your location to show you nearby contractor and services',
+				NSLocationAlwaysUsageDescription:
+					'We need your location to show you nearby contractors and services',
+			},
 		},
 		android: {
 			adaptiveIcon: {
 				foregroundImage: './assets/images/adaptive-icon.png',
 				backgroundColor: '#ffffff',
 			},
+			versionCode: 1,
+			package: 'net.robertdev.IwillFixIt',
+			useNextNotificationsApi: true,
 		},
 		web: {
 			favicon: './assets/images/favicon.png',

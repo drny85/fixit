@@ -67,6 +67,7 @@ const RequestServiceScreen: FC<Props> = ({ route, navigation }) => {
 	const [show, setShow] = useState<boolean>(false);
 	const [showReview, setShowReview] = useState<boolean>(false);
 	const [serviceDate, setServiceDate] = useState(new Date());
+	const addressRef = React.useRef<any>();
 
 	const onChange = (_: any, selectedDate: any) => {
 		const currentDate = selectedDate;
@@ -133,6 +134,7 @@ const RequestServiceScreen: FC<Props> = ({ route, navigation }) => {
 							}}
 						>
 							<GoogleAutoComplete
+								ref={addressRef}
 								label='Service Address'
 								onPress={(
 									data: GooglePlaceData,
@@ -453,7 +455,10 @@ const RequestServiceScreen: FC<Props> = ({ route, navigation }) => {
 				>
 					<Text>Service Address:</Text>
 					<TouchableOpacity
-						onPress={() => setPickAddress(true)}
+						onPress={() => {
+							setPickAddress(true);
+							addressRef.current?.focus();
+						}}
 						style={{
 							alignItems: 'center',
 							justifyContent: 'center',
