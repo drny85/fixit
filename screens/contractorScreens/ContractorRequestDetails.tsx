@@ -32,6 +32,7 @@ import { db, functions } from '../../firebase';
 import { getLogsByRequestId } from '../../redux/logsReducer/logsSlide';
 import { addLog, deleteLog } from '../../redux/logsReducer/logsActions';
 import { setRequest } from '../../redux/requestReducer/requestSlide';
+import { sendNotification } from '../../utils/sendNotification';
 
 type Props = NativeStackScreenProps<RequestTabParamList, 'RequestDetails'>;
 
@@ -53,35 +54,6 @@ const ContractorRequestDetails: FC<Props> = ({ navigation, route }) => {
 	const [logHasPrice, setLogHasPrice] = useState<boolean>(false);
 	const [status, setStatus] = useState<RequestStatus>(undefined);
 
-	// const handleSendQuote = async () => {
-	// 	try {
-	// 		setSaving(true);
-	// 		if (!logs.find((l) => l.cost! > 0)) {
-	// 			// @ts-ignore
-	// 			alert('There is no charges for this request');
-	// 			return;
-	// 		}
-
-	// 		const funcRef = await functions.httpsCallable('paymentIntent');
-	// 		const { data } = await funcRef({ requestId: request?.id });
-
-	// 		if (data.success) {
-	// 			const { id, customer, amount_total } = data.result;
-	// 			console.log(id, customer, amount_total);
-	// 			setSaving(false);
-	// 			navigation.goBack();
-	// 		} else {
-	// 			setSaving(false);
-	// 			console.log('Error', data.result);
-	// 		}
-	// 	} catch (error) {
-	// 		console.log(error);
-	// 		setSaving(false);
-	// 	} finally {
-	// 		//setSaving(false);
-	// 	}
-	// };
-
 	const handleStatusChange = async () => {
 		try {
 			if (!logs.find((l) => l.cost! > 0)) {
@@ -93,10 +65,16 @@ const ContractorRequestDetails: FC<Props> = ({ navigation, route }) => {
 				}
 			}
 			if (status !== undefined) {
-				const data = { ...request };
-				data.status = status;
-				dispatch(updateRequest(data as Request));
+				const dataObject = { ...request };
+				dataObject.status = status;
+				dispatch(updateRequest(dataObject as Request));
 				setShowEditModal(false);
+				sendNotification(
+					request?.customer?.pushToken!,
+					'Request Updates!',
+					`Your request for ${request?.service?.name} is now ${status}`,
+					{ notificationType: 'request_update', result: request }
+				);
 			}
 		} catch (error) {
 			console.log(error);
@@ -310,39 +288,6 @@ const ContractorRequestDetails: FC<Props> = ({ navigation, route }) => {
 		</EditModal>
 	);
 
-	// const renderSendQuoteButton = (logs: Log[]) => {
-	// 	const totalPrice = () =>
-	// 		logs.reduce((acc, curr) => acc + curr.cost!, 0).toFixed(2);
-
-	// 	if (!logs.find((l) => l.cost! > 0)) return null;
-
-	// 	return (
-	// 		<>
-	// 			<Divider />
-	// 			<Button disabled={saving} onPress={handleSendQuote}>
-	// 				<View
-	// 					style={{
-	// 						flexDirection: 'row',
-	// 						justifyContent: 'center',
-	// 						alignItems: 'center',
-	// 					}}
-	// 				>
-	// 					{saving ? (
-	// 						<Text>Sending quotes...</Text>
-	// 					) : (
-	// 						<>
-	// 							<Text bold>Send Quote</Text>
-	// 							<Text bold style={{ marginLeft: 8 }}>
-	// 								${totalPrice()}
-	// 							</Text>
-	// 						</>
-	// 					)}
-	// 				</View>
-	// 			</Button>
-	// 		</>
-	// 	);
-	// };
-
 	useEffect(() => {
 		setStatus(request?.status);
 
@@ -376,6 +321,8 @@ const ContractorRequestDetails: FC<Props> = ({ navigation, route }) => {
 			reqSub();
 		};
 	}, [request?.status]);
+
+	if (!request) return <Loader />;
 
 	return (
 		<Screen>

@@ -26,7 +26,7 @@ const RequestItem: FC<Props> = ({ request, onPress, onAcceptRequest }) => {
 			onPress={onPress}
 		>
 			<Container>
-				<Text numberOfLines={1} ellipsizeMode='tail' capitalize title center>
+				<Text numberOfLines={1} ellipsizeMode='tail' capitalize bold center>
 					Request for {request!.service?.name}
 				</Text>
 				<Divider style={{ backgroundColor: '#ffffff' }} large />

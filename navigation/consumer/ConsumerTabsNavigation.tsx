@@ -46,7 +46,7 @@ const ConsumerTabsNavigation: FC = () => {
 			}}
 		>
 			<Screen
-				name='HomeStack'
+				name='HomeStacks'
 				component={HomeStack}
 				options={({ route }) => {
 					const routeName = getFocusedRouteNameFromRoute(route);
@@ -61,7 +61,7 @@ const ConsumerTabsNavigation: FC = () => {
 				}}
 			/>
 			<Screen
-				name='OrdersStack'
+				name='RequestStacks'
 				component={RequestStack}
 				options={{
 					title: user?.role === 'consumer' ? 'My Requests' : 'My Jobs',

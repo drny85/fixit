@@ -3,18 +3,9 @@
  * https://reactnavigation.org/docs/typescript/
  */
 import { CompositeNavigationProp } from '@react-navigation/core';
-import {
-	BottomTabNavigationProp,
-	BottomTabScreenProps,
-} from '@react-navigation/bottom-tabs';
-import {
-	CompositeScreenProps,
-	NavigatorScreenParams,
-} from '@react-navigation/native';
-import {
-	NativeStackNavigationProp,
-	NativeStackScreenProps,
-} from '@react-navigation/native-stack';
+import { BottomTabNavigationProp } from '@react-navigation/bottom-tabs';
+import { NavigatorScreenParams } from '@react-navigation/native';
+import { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import { Service } from './constants/Services';
 import { Contractor } from './constants/Contractors';
 import { Request } from './redux/requestReducer/requestActions';
@@ -45,8 +36,8 @@ export type HomeStackParamList = {
 // 	NativeStackScreenProps<RootStackParamList, Screen>;
 
 export type RootTabParamList = {
-	HomeStack: undefined;
-	OrdersStack: undefined;
+	HomeStacks: undefined;
+	RequestStacks: undefined;
 	CartStack: undefined;
 	ProfileStack: undefined;
 	AdminStack: undefined;
@@ -105,7 +96,7 @@ export type ContractorRequestParamList = {
 };
 
 export type HomeScreenNavigationProp = CompositeNavigationProp<
-	BottomTabNavigationProp<RootTabParamList, 'HomeStack'>,
+	BottomTabNavigationProp<RootTabParamList, 'HomeStacks'>,
 	NativeStackNavigationProp<HomeTabParamList>
 >;
 
@@ -121,6 +112,7 @@ export interface Theme {
 	BUTTON_TEXT_COLOR: string;
 	PRIMARY_BUTTON_COLOR: string;
 	SHADOW_COLOR: string;
+	DONE_COLOR: string;
 	SECONDARY_BUTTON_COLOR: string;
 	STATUS_BAR: string;
 	ASCENT: string;

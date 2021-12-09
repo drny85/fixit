@@ -7,14 +7,13 @@ import {
 } from '../../screens';
 import { RequestTabParamList } from '../../types';
 import PaymentBreakdown from '../../screens/consumerScreens/requests/PaymentBreakdown';
-import PaymentScreen from '../../screens/consumerScreens/requests/PaymentScreen';
 import PaymentSuccess from '../../screens/consumerScreens/requests/PaymentSuccess';
 
 const { Navigator, Screen } = createNativeStackNavigator<RequestTabParamList>();
 
 const RequestStack: FC = () => {
 	return (
-		<Navigator>
+		<Navigator initialRouteName='RequestScreen'>
 			<Screen
 				name='RequestScreen'
 				component={RequestsScreen}
@@ -35,11 +34,7 @@ const RequestStack: FC = () => {
 				component={PaymentBreakdown}
 				options={{ headerShown: false }}
 			/>
-			<Screen
-				name='PaymentScreen'
-				component={PaymentScreen}
-				options={{ headerShown: false }}
-			/>
+
 			<Screen
 				name='PaymentSuccess'
 				component={PaymentSuccess}

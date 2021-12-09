@@ -1,8 +1,7 @@
 import * as functions from 'firebase-functions';
 import * as admin from 'firebase-admin';
 import * as dotenv from 'dotenv';
-const fetch = (...args: any) =>
-	import('node-fetch').then(({ default: fetch }) => fetch({ ...args }));
+import fetch from 'node-fetch';
 
 dotenv.config();
 
@@ -30,7 +29,7 @@ interface Log {
 
 exports.createPaymentIntent = functions.https.onCall(
 	async (
-		data: { requestId: string },
+		data: { requestId: string; contractorId: string },
 		context: functions.https.CallableContext
 	): Promise<response> => {
 		try {
@@ -68,6 +67,7 @@ exports.createPaymentIntent = functions.https.onCall(
 				metadata: {
 					requestId,
 					customerId: uid,
+					contractorId: data.contractorId,
 				},
 			});
 
@@ -269,7 +269,7 @@ exports.sendNotificationOnSignUp = functions.firestore
 				body: JSON.stringify({
 					to: token,
 					title: `New Sign Up`,
-					body: `${data.name} just signup, \n Email: ${data.email}`,
+					body: `${data.firstName} ${data.lastName} just signup, \n Email: ${data.email}`,
 					data: { notificationType: 'new_signup', userId },
 				}),
 			});
@@ -492,7 +492,7 @@ exports.webhookAccount = functions.https.onRequest(
 						.object as Stripe.PaymentIntent;
 
 					const { metadata, amount, id } = paymentIntentSucceeded;
-					const { requestId } = metadata;
+					const { requestId, contractorId } = metadata;
 
 					const requestRef = await admin
 						.firestore()
@@ -516,6 +516,23 @@ exports.webhookAccount = functions.https.onRequest(
 						},
 						{ merge: true }
 					);
+
+					if (contractorId) {
+						const contractor = await admin
+							.firestore()
+							.collection('users')
+							.doc(contractorId)
+							.get();
+						const pushToken = await contractor.data()?.pushToken;
+						if (pushToken) {
+							const requestObject = (await requestRef.get()).data();
+							await sendPaymentNotification(
+								pushToken,
+								requestId,
+								requestObject?.service.name
+							);
+						}
+					}
 
 					// Then define and call a function to handle the event payment_intent.succeeded
 					break;
@@ -545,120 +562,6 @@ exports.webhookAccount = functions.https.onRequest(
 		}
 	}
 );
-
-exports.webhooksLogger = functions.firestore
-	.document('webhooks/{docId}')
-	.onCreate(async (snapshot, context) => {
-		try {
-			const event = snapshot.data();
-
-			if (!event)
-				throw new functions.https.HttpsError('data-loss', 'no data found');
-
-			switch (event.type) {
-				// case 'account.updated':
-				// 	const account = event.data.object;
-				// 	// Then define and call a function to handle the event account.updated
-				// 	break;
-				// case 'account.application.authorized':
-				// 	const application = event.data.object;
-				// 	// Then define and call a function to handle the event account.application.authorized
-				// 	break;
-				// case 'account.application.deauthorized':
-				// 	const application = event.data.object;
-				// 	// Then define and call a function to handle the event account.application.deauthorized
-				// 	break;
-				// case 'account.external_account.created':
-				// 	const externalAccount = event.data.object;
-				// 	// Then define and call a function to handle the event account.external_account.created
-				// 	break;
-				// case 'account.external_account.deleted':
-				// 	const externalAccount = event.data.object;
-				// 	// Then define and call a function to handle the event account.external_account.deleted
-				// 	break;
-				// case 'account.external_account.updated':
-				// 	const externalAccount = event.data.object;
-				// 	// Then define and call a function to handle the event account.external_account.updated
-				// 	break;
-				// case 'payment_intent.amount_capturable_updated':
-				// 	const paymentIntent = event.data.object;
-				// 	// Then define and call a function to handle the event payment_intent.amount_capturable_updated
-				// 	break;
-				// case 'payment_intent.canceled':
-				// 	const paymentIntent = event.data.object;
-				// 	// Then define and call a function to handle the event payment_intent.canceled
-				// 	break;
-				// case 'payment_intent.created':
-				// 	const paymentIntent = event.data.object;
-				// 	// Then define and call a function to handle the event payment_intent.created
-				// 	break;
-
-				// case 'customer.created':
-				//   const customer = event.data.object as Stripe.Customer;
-				//   // Then define and call a function to handle the event customer.created
-				//   break;
-				// case 'payment_method.attached':
-				//   const paymentMethod = event.data.object;
-				//   // Then define and call a function to handle the event payment_method.attached
-				//   break;
-				// case 'payment_method.automatically_updated':
-				//   const paymentMethod = event.data.object;
-				//   // Then define and call a function to handle the event payment_method.automatically_updated
-				//   break;
-				// case 'payment_method.detached':
-				//   const paymentMethod = event.data.object;
-				//   // Then define and call a function to handle the event payment_method.detached
-				//   break;
-				// case 'payment_method.updated':
-				//   const paymentMethod = event.data.object;
-				//   // Then define and call a function to handle the event payment_method.updated
-				//   break;
-
-				case 'payment_intent.payment_failed':
-					const paymentIntentFailed = event.data.object as Stripe.PaymentIntent;
-					// Then define and call a function to handle the event payment_intent.payment_failed
-					console.log(paymentIntentFailed);
-					break;
-				case 'payment_intent.succeeded':
-					const paymentIntentSucceeded = event.data
-						.object as Stripe.PaymentIntent;
-					console.log(paymentIntentSucceeded);
-					const { metadata, amount, id } = paymentIntentSucceeded;
-					const { requestId } = metadata;
-
-					const requestRef = await admin
-						.firestore()
-						.collection('requests')
-						.doc(requestId);
-					const exits = (await requestRef.get()).exists;
-					if (!exits)
-						throw new functions.https.HttpsError(
-							'unavailable',
-							'no request found with id: ' + requestId
-						);
-
-					await requestRef.set(
-						{ paid: true, payment_intent_id: id, amountPaid: amount / 100 },
-						{ merge: true }
-					);
-
-					// Then define and call a function to handle the event payment_intent.succeeded
-					break;
-				// ... handle other event types
-
-				default:
-					console.log(`Unhandled event type ${event.type}`);
-					functions.logger.error('Error', event.type);
-			}
-		} catch (error) {
-			console.log(error);
-			functions.logger.error(`Error on webbkoohs loggger: ${error}`);
-			throw new functions.https.HttpsError(
-				'aborted',
-				'error on webhook loggers'
-			);
-		}
-	});
 
 const getLogs = async (requestId: string) => {
 	try {
@@ -723,4 +626,34 @@ async function isAuthorizedContractor(email: string): Promise<boolean> {
 	const user = await admin.auth().getUserByEmail(email);
 	if (user.customClaims && user.customClaims.role === 'contractor') return true;
 	return false;
+}
+
+async function sendPaymentNotification(
+	token: string,
+	requestId: string,
+	requestName: string
+) {
+	try {
+		const res = await fetch('https://exp.host/--/api/v2/push/send', {
+			method: 'POST',
+			headers: {
+				host: 'exp.host',
+				accept: 'application/json',
+				'accept-encoding': 'gzip, deflate',
+				'content-type': 'application/json',
+			},
+			body: JSON.stringify({
+				to: token,
+				title: `You Got Paid!`,
+				body: `Money is on your way for ${requestName} job`,
+				data: { notificationType: 'payment', result: requestId },
+			}),
+		});
+
+		const data = await res.json();
+		console.log(data);
+	} catch (error) {
+		console.log(error);
+		throw functions.logger.error(error);
+	}
 }

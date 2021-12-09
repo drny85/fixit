@@ -15,6 +15,7 @@ export interface Contractor {
 	address?: string;
 	coords?: { lat: number; lng: number } | null;
 	bio?: string;
+	pushToken?: string;
 	imageUrl?: string | null;
 	password?: string;
 	role: 'contractor' | 'consumer' | 'admin';

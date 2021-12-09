@@ -2,14 +2,13 @@ import { FontAwesome } from '@expo/vector-icons';
 import React, { FC, useState } from 'react';
 import { Alert, View } from 'react-native';
 import styled from 'styled-components/native';
-import { InputField, Screen, Text } from '../../../components';
+import { Screen, Text } from '../../../components';
 import { logout } from '../../../redux/authReducer/authActions';
 import { useAppDispatch, useAppSelector } from '../../../redux/store';
 
 const SettingsScreen: FC = () => {
 	const dispatch = useAppDispatch();
 	const { user } = useAppSelector((state) => state.auth);
-
 	const hanldeLogOut = async () => {
 		try {
 			Alert.alert('Loggin Out', 'Are you sure you want exit', [

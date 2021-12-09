@@ -14,6 +14,7 @@ declare module 'styled-components' {
 		BUTTON_TEXT_COLOR: string;
 		PRIMARY_BUTTON_COLOR: string;
 		SHADOW_COLOR: string;
+		DONE_COLOR: string;
 		SECONDARY_BUTTON_COLOR: string;
 		STATUS_BAR: ThemeMode | string;
 		ASCENT: string;

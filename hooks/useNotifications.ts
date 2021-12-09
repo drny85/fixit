@@ -21,7 +21,7 @@ Notifications.setNotificationHandler({
 
 let pushToken = null;
 const useNotifications = () => {
-	const naviagtion = useNavigation<any>();
+	const navigation = useNavigation<any>();
 
 	const notificationListener = useRef<any>();
 	const responseListener = useRef<any>();
@@ -49,14 +49,25 @@ const useNotifications = () => {
 						data.notificationType === 'new_signup' &&
 						user?.role === 'admin'
 					) {
-						naviagtion.navigate('ContractorsDashboard', {
+						navigation.navigate('ContractorsDashboard', {
 							userId: data.userId,
 						});
 					} else if (
 						data.notificationType === 'new_request' &&
 						user?.role === 'consumer'
 					) {
-						naviagtion.navigate('OrdersStack');
+						navigation.navigate('RequestStacks');
+					}
+
+					if (data.notificationType === 'request_update') {
+						navigation.navigate('RequestStacks', {
+							screen: 'RequestScreen',
+							params: {
+								screen: 'RequestDetails',
+
+								params: { request: data.result },
+							},
+						});
 					}
 				}
 			);
@@ -81,6 +92,13 @@ const useNotifications = () => {
 				}
 
 				if (finalStatus !== 'granted') {
+					const { canAskAgain } = await Notifications.getPermissionsAsync();
+					if (canAskAgain) {
+						const { status } = await Notifications.requestPermissionsAsync();
+						finalStatus = status;
+					}
+
+					console.log('Not Granted');
 					// Alert.alert(
 					// 	'Error',
 					// 	'Failed to get push token for push notification!',
