@@ -171,6 +171,7 @@ const OnBoardingScreen: FC<Props> = ({ navigation }) => {
 						justifyContent: 'space-between',
 						alignSelf: 'center',
 						marginHorizontal: 25,
+						width: SIZES.width * 0.9,
 						marginTop: 20,
 					}}
 				>

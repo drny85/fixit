@@ -12,6 +12,7 @@ import {
 	Button,
 	Divider,
 	Header,
+	Loader,
 	PhoneCall,
 	Screen,
 	Text,
@@ -21,7 +22,7 @@ import ImagesContainer from '../../../components/ImagesContainer';
 import ReviewModal from '../../../components/ReviewModal';
 import { SIZES } from '../../../constants';
 import { Contractor, Review } from '../../../constants/Contractors';
-import { functions } from '../../../firebase';
+import { db, functions } from '../../../firebase';
 
 import { Request } from '../../../redux/requestReducer/requestActions';
 import {
@@ -30,11 +31,12 @@ import {
 } from '../../../redux/reviewsReducer/reviewsAction';
 import { useAppDispatch, useAppSelector } from '../../../redux/store';
 import { RequestTabParamList } from '../../../types';
+import { setRequest } from '../../../redux/requestReducer/requestSlide';
 
 type Props = NativeStackScreenProps<RequestTabParamList, 'RequestDetails'>;
 
 const RequestDetails: FC<Props> = ({ navigation, route }) => {
-	const { request } = route.params;
+	const { request: requestObject } = route.params;
 	const dispatch = useAppDispatch();
 
 	const [viewImage, setViewImage] = useState<boolean>(false);
@@ -45,21 +47,25 @@ const RequestDetails: FC<Props> = ({ navigation, route }) => {
 	const [canContinue, setContinue] = useState<boolean>(false);
 	const [rating, setRating] = useState<number>(1);
 	const [recommended, setRecommended] = useState<boolean>(true);
+	const [reviewed, setReviewed] = useState<boolean>(true);
 	const [anonymous, setAnonymous] = useState<boolean>(true);
-	const { reviews } = useAppSelector((state) => state.reviews);
+	const { reviews, loading: loadingReview } = useAppSelector(
+		(state) => state.reviews
+	);
+	const { request } = useAppSelector((state) => state.requests);
 
 	const onFinishRating = (rating: number) => {
 		setRating(rating);
 	};
 
-	const alreadyReviewed = useCallback(() => {
-		const index = reviews.findIndex((s) => s.requestId === request?.id);
+	const alreadyReviewed = () => {
+		const index = reviews.findIndex((s) => s.requestId === requestObject?.id);
 
 		if (reviews.length === 0) return false;
 		if (index === -1) return false;
 
 		return true;
-	}, [request]);
+	};
 
 	const submitReview = async () => {
 		try {
@@ -106,8 +112,24 @@ const RequestDetails: FC<Props> = ({ navigation, route }) => {
 	};
 
 	useEffect(() => {
-		dispatch(getReviewsByContractor(request?.contractor?.id!));
-	}, [dispatch]);
+		dispatch(getReviewsByContractor(requestObject?.contractor?.id!));
+		setReviewed(alreadyReviewed());
+		const sub = db
+			.collection('requests')
+			.doc(requestObject?.id)
+			.onSnapshot(
+				(snapshot) => {
+					if (snapshot.exists) {
+						dispatch(setRequest({ id: snapshot.id, ...snapshot.data() }));
+					}
+				},
+				({ message }) => {
+					console.log(message);
+				}
+			);
+
+		return sub;
+	}, [dispatch, reviewed]);
 
 	const renderContractorInfo = (res: Request) => {
 		return (
@@ -140,9 +162,27 @@ const RequestDetails: FC<Props> = ({ navigation, route }) => {
 		);
 	};
 
+	const renderPaymentInfo = (res: Request) => {
+		return (
+			<View>
+				<Divider large />
+				<Text bold center>
+					Payment Info
+				</Text>
+				<View>
+					<Text>Paid: Yes</Text>
+					<Text>Paid On: {moment(request?.paidOn).format('lll')}</Text>
+					<Text bold>Amount: ${request?.amountPaid} </Text>
+				</View>
+			</View>
+		);
+	};
+
+	if (!request) return <Loader />;
+
 	return (
 		<Screen>
-			<Header canGoBack title={`Request for ${request!.service?.name}`} />
+			<Header canGoBack title={`Request for ${request?.service?.name}`} />
 			<ViewContainer>
 				<View
 					style={{
@@ -154,7 +194,7 @@ const RequestDetails: FC<Props> = ({ navigation, route }) => {
 					</Text>
 					{user?.role === 'consumer' &&
 						request?.status === 'completed' &&
-						!alreadyReviewed() && (
+						!reviewed && (
 							<View
 								style={{
 									width: SIZES.isSmallDevice
@@ -190,6 +230,8 @@ const RequestDetails: FC<Props> = ({ navigation, route }) => {
 					<Text>Time / Window: {request?.serviceTime}</Text>
 					<Text>Address: {request?.serviceAddress}</Text>
 					{request?.apt !== '' && <Text>Apt / Unit: {request?.apt}</Text>}
+
+					{request.paid && renderPaymentInfo(request)}
 					<Divider large />
 					{renderContractorInfo(request!)}
 					<Divider large />
@@ -223,11 +265,13 @@ const RequestDetails: FC<Props> = ({ navigation, route }) => {
 				setComment={(text) => setReview(text)}
 			/>
 			{request?.status === 'waiting for payment' && !request.paid && (
-				<FloatingButton
-					onPress={() =>
-						navigation.navigate('PaymentBreakDown', { request: request })
-					}
-				/>
+				<View style={{ position: 'absolute', bottom: 0, right: 20 }}>
+					<FloatingButton
+						onPress={() =>
+							navigation.navigate('PaymentBreakDown', { request: request })
+						}
+					/>
+				</View>
 			)}
 		</Screen>
 	);

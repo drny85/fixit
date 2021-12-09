@@ -21,7 +21,7 @@ interface TextProps {
 }
 
 const Text = styled(Animatable.Text)<TextProps>`
-	color: ${({ theme }) => theme.TEXT_COLOR};
+	color: ${({ theme }) => (theme.mode === 'dark' ? 'white' : 'black')};
 	margin: 5px;
 	font-family: ${({ tange }) => (tange ? 'tange' : 'montserrat')};
 	font-weight: 900;

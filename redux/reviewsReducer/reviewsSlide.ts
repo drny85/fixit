@@ -26,6 +26,7 @@ const reviewsSlide = createSlice({
 	extraReducers: (builder) => {
 		builder
 			.addCase(getReviewsByContractor.pending, (state) => {
+				console.log('Getting reviews');
 				state.loading = true;
 			})
 			.addCase(getReviewsByContractor.fulfilled, (state, { payload }) => {

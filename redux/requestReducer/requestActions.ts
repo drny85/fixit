@@ -18,6 +18,8 @@ export interface Request {
 	serviceTime: string;
 	apt: string | null;
 	paid: boolean;
+	amount?: number;
+	amountPaid?: number;
 	payment_intent_id?: string;
 	paidOn?: string;
 	status:

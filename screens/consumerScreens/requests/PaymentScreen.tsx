@@ -30,16 +30,12 @@ const PaymentScreen: FC<Props> = ({ route, navigation }) => {
 				requestId: route.params.requestId,
 			});
 
-			// setCustomerId(customer);
-			console.log('DATA', data);
 			if (!data.success) {
 				alert('No data available');
 				return;
 			}
-			const { customer, ephemeralKey, paymentIntent, paymentId } = data.result;
-			console.log('Payment ID', paymentId);
+			const { customer, ephemeralKey, paymentIntent } = data.result;
 
-			// console.log(customer, paymentIntent, ephemeralKey);
 			const { error } = await initPaymentSheet({
 				customerId: customer,
 				customerEphemeralKeySecret: ephemeralKey,
@@ -68,14 +64,7 @@ const PaymentScreen: FC<Props> = ({ route, navigation }) => {
 				Alert.alert(`${error.code}`, error.message);
 				return;
 			} else {
-				await db.collection('requests').doc(route.params.requestId).set(
-					{
-						paid: true,
-						paidOn: new Date().toISOString(),
-						status: 'completed',
-					},
-					{ merge: true }
-				);
+				console.log('Payment Success');
 				navigation.replace('PaymentSuccess');
 			}
 		} catch (error) {

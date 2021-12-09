@@ -101,7 +101,7 @@ export type RequestTabParamList = {
 export type ContractorRequestParamList = {
 	ContractorHome: undefined;
 	ContractorRequestsScreen: undefined;
-	ContractorRequestDetails: undefined;
+	ContractorRequestDetails: { request: Request };
 };
 
 export type HomeScreenNavigationProp = CompositeNavigationProp<

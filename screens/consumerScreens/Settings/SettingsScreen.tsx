@@ -29,7 +29,7 @@ const SettingsScreen: FC = () => {
 		<Screen>
 			<Header>
 				<Text></Text>
-				<Text title>{user?.name}</Text>
+				<Text title>{`${user?.firstName} ${user?.lastName}`}</Text>
 				<LogOut onPress={hanldeLogOut}>
 					<Text>Log Out</Text>
 				</LogOut>

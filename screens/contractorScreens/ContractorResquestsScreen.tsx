@@ -34,8 +34,7 @@ const ContractorResquestsScreen: FC<Props> = ({ navigation }) => {
 			onAcceptRequest={() => onAcceptRequest(item)}
 			request={item}
 			onPress={() => {
-				dispatch(setRequest(item));
-				navigation.navigate('ContractorRequestDetails');
+				navigation.navigate('ContractorRequestDetails', { request: item });
 			}}
 		/>
 	);

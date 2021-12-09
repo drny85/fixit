@@ -1,6 +1,17 @@
 import { createAsyncThunk } from '@reduxjs/toolkit';
 import { db } from '../../firebase';
 import { Log } from '../../types';
+import { RootState } from '../store';
+
+export interface Price {
+	id?: string;
+	requestId: string;
+	cost: number;
+	description: string;
+	customer_id?: string;
+	price_id?: string;
+	createdOn?: string;
+}
 
 export const addLog = async (log: Log): Promise<boolean> => {
 	try {
@@ -25,3 +36,40 @@ export const deleteLog = async (log: Log) => {
 		return false;
 	}
 };
+
+export const addPrice = createAsyncThunk(
+	'prices/addPrice',
+	async (priceData: Price, { rejectWithValue, getState }) => {
+		try {
+			const {
+				auth: { user },
+			} = getState() as RootState;
+			await db
+				.collection('prices')
+				.doc(user?.id)
+				.collection('prices')
+				.add(priceData);
+		} catch (error: any) {
+			return rejectWithValue({ message: error.message });
+		}
+	}
+);
+
+export const deletePrice = createAsyncThunk(
+	'prices/deletePrice',
+	async (priceId: string, { rejectWithValue, getState }) => {
+		try {
+			const {
+				auth: { user },
+			} = getState() as RootState;
+			await db
+				.collection('prices')
+				.doc(user?.id)
+				.collection('prices')
+				.doc(priceId)
+				.delete();
+		} catch (error: any) {
+			return rejectWithValue({ message: error.message });
+		}
+	}
+);

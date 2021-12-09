@@ -31,6 +31,7 @@ import { Switch } from 'react-native-elements';
 import { db, functions } from '../../firebase';
 import { getLogsByRequestId } from '../../redux/logsReducer/logsSlide';
 import { addLog, deleteLog } from '../../redux/logsReducer/logsActions';
+import { setRequest } from '../../redux/requestReducer/requestSlide';
 
 type Props = NativeStackScreenProps<RequestTabParamList, 'RequestDetails'>;
 
@@ -52,35 +53,34 @@ const ContractorRequestDetails: FC<Props> = ({ navigation, route }) => {
 	const [logHasPrice, setLogHasPrice] = useState<boolean>(false);
 	const [status, setStatus] = useState<RequestStatus>(undefined);
 
-	const handleSendQuote = async () => {
-		try {
-			console.log('HERE');
-			setSaving(true);
-			if (!logs.find((l) => l.cost! > 0)) {
-				// @ts-ignore
-				alert('There is no charges for this request');
-				return;
-			}
+	// const handleSendQuote = async () => {
+	// 	try {
+	// 		setSaving(true);
+	// 		if (!logs.find((l) => l.cost! > 0)) {
+	// 			// @ts-ignore
+	// 			alert('There is no charges for this request');
+	// 			return;
+	// 		}
 
-			const funcRef = await functions.httpsCallable('paymentIntent');
-			const { data } = await funcRef({ requestId: request?.id });
-			console.log('DATA', data);
-			if (data.success) {
-				const { id, customer, amount_total } = data.result;
-				console.log(id, customer, amount_total);
-				setSaving(false);
-				navigation.goBack();
-			} else {
-				setSaving(false);
-				console.log('Error', data.result);
-			}
-		} catch (error) {
-			console.log(error);
-			setSaving(false);
-		} finally {
-			//setSaving(false);
-		}
-	};
+	// 		const funcRef = await functions.httpsCallable('paymentIntent');
+	// 		const { data } = await funcRef({ requestId: request?.id });
+
+	// 		if (data.success) {
+	// 			const { id, customer, amount_total } = data.result;
+	// 			console.log(id, customer, amount_total);
+	// 			setSaving(false);
+	// 			navigation.goBack();
+	// 		} else {
+	// 			setSaving(false);
+	// 			console.log('Error', data.result);
+	// 		}
+	// 	} catch (error) {
+	// 		console.log(error);
+	// 		setSaving(false);
+	// 	} finally {
+	// 		//setSaving(false);
+	// 	}
+	// };
 
 	const handleStatusChange = async () => {
 		try {
@@ -193,6 +193,14 @@ const ContractorRequestDetails: FC<Props> = ({ navigation, route }) => {
 
 				<Text capitalize>Contact Method: {request?.contactMethod}</Text>
 				<Text>Address: {request?.serviceAddress}</Text>
+				{request?.apt !== '' && <Text>Apt: {request?.apt}</Text>}
+				{request?.paid && (
+					<>
+						<Text bold>Paid: Yes</Text>
+						<Text>Paid On: {moment(request.paidOn).format('lll')}</Text>
+						<Text bold>Amount: ${request.amountPaid}</Text>
+					</>
+				)}
 			</View>
 		);
 	};
@@ -279,15 +287,17 @@ const ContractorRequestDetails: FC<Props> = ({ navigation, route }) => {
 							Change Request Status
 						</Text>
 						<View>
-							{STATUS.map((s) => (
-								<CheckBoxItem
-									key={s}
-									title={s!}
-									checked={s === status?.toLowerCase()}
-									onPress={() => setStatus(s)}
-									theme={theme}
-								/>
-							))}
+							{STATUS.filter((i) => i !== 'completed' && i !== 'pending').map(
+								(s) => (
+									<CheckBoxItem
+										key={s}
+										title={s!}
+										checked={s === status?.toLowerCase()}
+										onPress={() => setStatus(s)}
+										theme={theme}
+									/>
+								)
+							)}
 						</View>
 					</View>
 					<View style={{ position: 'absolute', bottom: 50 }}>
@@ -300,38 +310,38 @@ const ContractorRequestDetails: FC<Props> = ({ navigation, route }) => {
 		</EditModal>
 	);
 
-	const renderSendQuoteButton = (logs: Log[]) => {
-		const totalPrice = () =>
-			logs.reduce((acc, curr) => acc + curr.cost!, 0).toFixed(2);
+	// const renderSendQuoteButton = (logs: Log[]) => {
+	// 	const totalPrice = () =>
+	// 		logs.reduce((acc, curr) => acc + curr.cost!, 0).toFixed(2);
 
-		if (!logs.find((l) => l.cost! > 0)) return null;
+	// 	if (!logs.find((l) => l.cost! > 0)) return null;
 
-		return (
-			<>
-				<Divider />
-				<Button disabled={saving} onPress={handleSendQuote}>
-					<View
-						style={{
-							flexDirection: 'row',
-							justifyContent: 'center',
-							alignItems: 'center',
-						}}
-					>
-						{saving ? (
-							<Text>Sending quotes...</Text>
-						) : (
-							<>
-								<Text bold>Send Quote</Text>
-								<Text bold style={{ marginLeft: 8 }}>
-									${totalPrice()}
-								</Text>
-							</>
-						)}
-					</View>
-				</Button>
-			</>
-		);
-	};
+	// 	return (
+	// 		<>
+	// 			<Divider />
+	// 			<Button disabled={saving} onPress={handleSendQuote}>
+	// 				<View
+	// 					style={{
+	// 						flexDirection: 'row',
+	// 						justifyContent: 'center',
+	// 						alignItems: 'center',
+	// 					}}
+	// 				>
+	// 					{saving ? (
+	// 						<Text>Sending quotes...</Text>
+	// 					) : (
+	// 						<>
+	// 							<Text bold>Send Quote</Text>
+	// 							<Text bold style={{ marginLeft: 8 }}>
+	// 								${totalPrice()}
+	// 							</Text>
+	// 						</>
+	// 					)}
+	// 				</View>
+	// 			</Button>
+	// 		</>
+	// 	);
+	// };
 
 	useEffect(() => {
 		setStatus(request?.status);
@@ -347,8 +357,24 @@ const ContractorRequestDetails: FC<Props> = ({ navigation, route }) => {
 					)
 				);
 			});
+		const reqSub = db
+			.collection('requests')
+			.doc(route.params.request?.id)
+			.onSnapshot(
+				(snapshot) => {
+					if (snapshot.exists) {
+						dispatch(setRequest({ id: snapshot.id, ...snapshot.data() }));
+					}
+				},
+				({ message }) => {
+					console.log(message);
+				}
+			);
 
-		return logsSub;
+		return () => {
+			logsSub();
+			reqSub();
+		};
 	}, [request?.status]);
 
 	return (
@@ -409,7 +435,7 @@ const ContractorRequestDetails: FC<Props> = ({ navigation, route }) => {
 					</Text>
 					<Text>{request?.description}</Text>
 				</View>
-				{renderSendQuoteButton(logs)}
+
 				<View
 					style={{
 						flex: 1,

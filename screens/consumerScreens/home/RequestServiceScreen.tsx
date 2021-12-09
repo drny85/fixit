@@ -282,6 +282,7 @@ const RequestServiceScreen: FC<Props> = ({ route, navigation }) => {
 								<FontAwesome
 									name='thumbs-o-up'
 									style={{ marginLeft: 10 }}
+									color={theme.mode === 'dark' ? '#ffffff' : '#212121'}
 									size={24}
 								/>
 							</SubmitRequestButton>
