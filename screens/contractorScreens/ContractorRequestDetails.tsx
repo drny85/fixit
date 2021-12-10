@@ -160,10 +160,8 @@ const ContractorRequestDetails: FC<Props> = ({ navigation, route }) => {
 					</Text>
 				</TouchableWithoutFeedback>
 
-				<View style={{ flexDirection: 'row', alignItems: 'center' }}>
-					<Text>Phone: </Text>
-					<PhoneCall phone={request!.customer!.phone} />
-				</View>
+				<PhoneCall title='Phone' phone={request!.customer!.phone!} />
+
 				<View style={{ flexDirection: 'row', alignItems: 'center' }}>
 					<Text>Email: </Text>
 					<EmailLink request={res} />

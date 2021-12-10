@@ -18,9 +18,9 @@ const ContractorsDashboard: FC<Props> = ({ route, navigation }) => {
 	const [contractors, setContractors] = useState<Contractor[]>([]);
 
 	const contractorStatus = route.params?.contractorStatus;
-	console.log(contractorStatus);
+
 	const [loading, setLoading] = useState<boolean>(true);
-	const theme = useAppSelector((state) => state.theme);
+	//const theme = useAppSelector((state) => state.theme);
 
 	const renderItems: ListRenderItem<Contractor> = ({ item }) => {
 		return (
@@ -34,7 +34,15 @@ const ContractorsDashboard: FC<Props> = ({ route, navigation }) => {
 				<Text lightText bold>
 					{item.firstName} {item.lastName}
 				</Text>
-				<Entypo name='chevron-right' size={24} color={'#ffffff'} />
+				<RightContainer style={{ flexDirection: 'row', alignItems: 'center' }}>
+					<Text lightText caption>
+						Status: {item.isActive ? 'active' : 'inactive'}
+					</Text>
+					<ActiveStatusDot
+						style={{ backgroundColor: item.isActive ? 'green' : 'red' }}
+					/>
+					<Entypo name='chevron-right' size={24} color={'#ffffff'} />
+				</RightContainer>
 			</UserCard>
 		);
 	};
@@ -47,8 +55,10 @@ const ContractorsDashboard: FC<Props> = ({ route, navigation }) => {
 			setContractors(users);
 			setLoading(false);
 		}
+		return () => {
+			setContractors(users);
+		};
 	}, [contractorStatus]);
-	console.log(users.length);
 
 	if (loading) return <Loader />;
 	return (
@@ -77,6 +87,13 @@ const UserCard = styled.TouchableOpacity`
 	margin: 10px 5px;
 	border-radius: 15px;
 	background-color: ${({ theme }) => theme.ASCENT};
+`;
+
+const RightContainer = styled.View``;
+const ActiveStatusDot = styled.View`
+	height: 15px;
+	width: 15px;
+	border-radius: 8px;
 `;
 
 const UsersFlatList = styled.FlatList``;

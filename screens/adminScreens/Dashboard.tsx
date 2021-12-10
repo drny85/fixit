@@ -24,7 +24,7 @@ const Dashboard: FC<Props> = ({ navigation }) => {
 		<Screen>
 			<DashboardCardContainer style={{ flexDirection: 'row' }}>
 				<DashboardCard
-					style={[styles.shadow, { shadowColor: theme.ASCENT }]}
+					style={[styles.shadow, { shadowColor: theme.PRIMARY_BUTTON_COLOR }]}
 					onPress={() =>
 						navigation.navigate('ContractorsDashboard', {
 							screen: 'AdminContractorsDashboard',
@@ -32,16 +32,16 @@ const Dashboard: FC<Props> = ({ navigation }) => {
 						})
 					}
 				>
-					<Text>New Contractos</Text>
+					<Text>New / Inactive</Text>
 					<Text bold title>
-						{users.filter((u) => u.isActive === false).length}
+						{users.filter((u) => !u.isActive && !u.connectedAccountId).length}
 					</Text>
 				</DashboardCard>
 				<DashboardCard
 					style={[
 						styles.shadow,
 						{
-							shadowColor: theme.ASCENT,
+							shadowColor: theme.PRIMARY_BUTTON_COLOR,
 						},
 					]}
 					onPress={() =>
@@ -51,8 +51,29 @@ const Dashboard: FC<Props> = ({ navigation }) => {
 						})
 					}
 				>
-					<Text>All Contractors</Text>
-					<Text title>{users.length}</Text>
+					<Text>Active / No Connected</Text>
+					<Text title>
+						{users.filter((u) => u.isActive && !u.connectedAccountId).length}
+					</Text>
+				</DashboardCard>
+				<DashboardCard
+					style={[
+						styles.shadow,
+						{
+							shadowColor: theme.PRIMARY_BUTTON_COLOR,
+						},
+					]}
+					onPress={() =>
+						navigation.navigate('ContractorsDashboard', {
+							screen: 'AdminContractorsDashboard',
+							params: { contractorStatus: 'active' },
+						})
+					}
+				>
+					<Text>Active / Connect </Text>
+					<Text title>
+						{users.filter((u) => u.isActive && u.connectedAccountId).length}
+					</Text>
 				</DashboardCard>
 			</DashboardCardContainer>
 
@@ -67,10 +88,10 @@ export default Dashboard;
 
 const styles = StyleSheet.create({
 	shadow: {
-		shadowOffset: { width: 6, height: 8 },
-		elevation: 8,
-		shadowOpacity: 0.7,
-		shadowRadius: 6,
+		shadowOffset: { width: 6, height: 6 },
+		elevation: 6,
+		shadowOpacity: 0.3,
+		shadowRadius: 4,
 	},
 });
 

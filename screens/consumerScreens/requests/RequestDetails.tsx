@@ -150,10 +150,8 @@ const RequestDetails: FC<Props> = ({ navigation, route }) => {
 					</Text>
 				</TouchableWithoutFeedback>
 
-				<View style={{ flexDirection: 'row', alignItems: 'center' }}>
-					<Text>Phone: </Text>
-					<PhoneCall phone={request!.contractor!.phone} />
-				</View>
+				<PhoneCall title='phone:' phone={request!.contractor!.phone} />
+
 				<Text>
 					Contractor: {request?.contractor?.firstName}{' '}
 					{request?.contractor?.lastName}

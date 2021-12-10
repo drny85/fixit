@@ -101,6 +101,7 @@ const SignUpAsContractor: FC<Props> = ({ navigation }) => {
 
 			if (
 				firstName.length < 3 ||
+				lastName.length < 3 ||
 				businessName.length < 5 ||
 				address.length < 5 ||
 				phone.length < 10 ||

@@ -83,7 +83,6 @@ export const login = createAsyncThunk(
 
 			if (user?.uid) {
 				if (user.emailVerified) {
-					console.log('Is VErified', user.emailVerified);
 					const returnedUser = await db.collection('users').doc(user.uid);
 					returnedUser.update({ isVerified: true });
 					const updated = await returnedUser.get();

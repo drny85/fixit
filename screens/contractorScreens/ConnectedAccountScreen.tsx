@@ -9,31 +9,31 @@ import { functions } from '../../firebase';
 import { useAppSelector } from '../../redux/store';
 import { HomeTabParamList } from '../../types';
 import * as Linking from 'expo-linking';
+import { autoSignInUser } from '../../redux/authReducer/authActions';
+import { useDispatch } from 'react-redux';
 
 type Props = NativeStackScreenProps<HomeTabParamList, 'ConnectedAccountScreen'>;
 
 const ConnectedAccountScreen: FC<Props> = ({ route, navigation }) => {
 	const { user } = useAppSelector((state) => state.auth);
 	const webViewRef = useRef<any>();
+	const dispatch = useDispatch();
 	const [processing, setProcessing] = useState<boolean>(true);
 	const [currentUrl, setCurrentUrl] = useState<string | null>(null);
 	const handleNavigationChanges = async (newNavState: WebViewNavigation) => {
 		const { url, loading } = newNavState;
-		console.log('Initial URL', url);
-		console.log('params1', getParams(url));
 		if (url.includes('/reauth')) {
 			console.log('refresh url');
 			const result = await handleActivateAccount();
 			console.log('RESULT', result);
 			setCurrentUrl(result!);
 		} else if (url.includes('/return_url')) {
-			console.log('params', getParams(url));
 			//webViewRef.current?.stopLoading();
 			const { accountId } = getParams(url);
 			const result = await checkifAccountCanTakePayment(accountId);
 			if (result?.success) {
 				console.log('Navigate to success page');
-				navigation.pop();
+				dispatch(autoSignInUser(user?.id!));
 			} else {
 				// @ts-ignore
 				alert('Somethign went wrong while entering the information');

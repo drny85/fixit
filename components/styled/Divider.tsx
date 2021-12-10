@@ -1,3 +1,5 @@
+import { ViewStyle } from 'react-native';
+import { color } from 'react-native-reanimated';
 import styled from 'styled-components/native';
 
 interface DividerProps {
