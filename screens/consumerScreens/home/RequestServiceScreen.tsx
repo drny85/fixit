@@ -117,7 +117,7 @@ const RequestServiceScreen: FC<Props> = ({ route, navigation }) => {
 								<Text
 									style={{
 										...FONTS.h3,
-										color: theme.mode === 'dark' ? '#ffffff' : '#212121',
+										color: '#ffffff',
 									}}
 								>
 									Done

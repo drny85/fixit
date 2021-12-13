@@ -386,13 +386,13 @@ exports.addConnectedAccountToUser = functions.https.onCall(
 			});
 			const { charges_enabled } = account;
 			if (charges_enabled) {
-				await admin
-					.firestore()
-					.collection('users')
-					.doc(context.auth.uid)
-					.update({
+				await admin.firestore().collection('users').doc(context.auth.uid).set(
+					{
 						connectedAccountId: account.id,
-					});
+						activatedOn: new Date().toISOString(),
+					},
+					{ merge: true }
+				);
 			}
 			return { success: true, result: charges_enabled };
 		} catch (error) {
@@ -438,6 +438,28 @@ exports.webhook = functions.https.onRequest(
 			};
 
 			await webhookRef.set(data);
+
+			switch (event.type) {
+				case 'account.updated':
+					const accountUpdated = event.data.object as Stripe.Account;
+					const { details_submitted, charges_enabled, id } = accountUpdated;
+					functions.logger.log(
+						`Details Submitted for acc ${accountUpdated.id} ${JSON.stringify(
+							details_submitted,
+							null,
+							2
+						)}`
+					);
+					if (charges_enabled) {
+						functions.logger.log('Account successfuly active - ' + id);
+					}
+					break;
+
+				default:
+					console.log(`Unhandled event type ${event.type}`);
+					functions.logger.error('Error', event.type);
+					break;
+			}
 
 			return res.status(200).send('Success');
 		} catch (error) {
@@ -552,6 +574,7 @@ exports.webhookAccount = functions.https.onRequest(
 				default:
 					console.log(`Unhandled event type ${event.type}`);
 					functions.logger.error('Error', event.type);
+					break;
 			}
 
 			return res.status(200).send('Success');

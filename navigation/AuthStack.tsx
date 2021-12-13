@@ -9,6 +9,7 @@ import {
 } from '../screens';
 import { AuthTabParamList } from '../types';
 import SignupStatus from '../screens/authScreens/SignupStatus';
+import ForgotPasswordScreen from '../screens/authScreens/ForgotPasswordScreen';
 
 const { Navigator, Screen } = createNativeStackNavigator<AuthTabParamList>();
 
@@ -43,6 +44,12 @@ const AuthStack: FC = () => {
 			<Screen
 				name='SignupStatus'
 				component={SignupStatus}
+				options={{ headerShown: false }}
+			/>
+
+			<Screen
+				name='ForgotPasswordScreen'
+				component={ForgotPasswordScreen}
 				options={{ headerShown: false }}
 			/>
 		</Navigator>

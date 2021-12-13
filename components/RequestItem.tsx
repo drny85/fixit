@@ -20,7 +20,7 @@ const RequestItem: FC<Props> = ({ request, onPress, onAcceptRequest }) => {
 			style={{
 				backgroundColor:
 					request.status === 'completed'
-						? theme.ASCENT
+						? theme.SHADOW_COLOR
 						: theme.PRIMARY_BUTTON_COLOR,
 			}}
 			onPress={onPress}

@@ -1,16 +1,17 @@
 import React, { FC, useState } from 'react';
-import { Alert, TextInput, TouchableOpacity, View } from 'react-native';
+import {
+	Alert,
+	TouchableHighlight,
+	TouchableOpacity,
+	View,
+} from 'react-native';
 import { InputField, Loader, Screen, Text } from '../../components';
 import { KeyboardAwareScrollView } from 'react-native-keyboard-aware-scroll-view';
 import styled from 'styled-components/native';
 import { theme } from '../../redux/themeReducer/themeSlide';
 import { useAppDispatch, useAppSelector } from '../../redux/store';
 import { isEmailValid } from '../../utils/IsEmailValid';
-import {
-	autoSignInUser,
-	isUserVerifiedAndActive,
-	login,
-} from '../../redux/authReducer/authActions';
+import { autoSignInUser } from '../../redux/authReducer/authActions';
 
 import { AuthTabParamList } from '../../types';
 import { NativeStackScreenProps } from '@react-navigation/native-stack';
@@ -184,6 +185,19 @@ const LoginScreen: FC<Props> = ({ navigation }) => {
 							/>
 						}
 					/>
+					<TouchableHighlight
+						style={{ marginBottom: 5 }}
+						activeOpacity={0}
+						underlayColor={theme.BACKGROUND_COLOR}
+						onPress={() =>
+							navigation.navigate('ForgotPasswordScreen', { email: email })
+						}
+					>
+						<Text caption right>
+							Forgot Password?
+						</Text>
+					</TouchableHighlight>
+
 					<SubmitRequestButton onPress={handleLogin}>
 						<Text title>Login</Text>
 					</SubmitRequestButton>

@@ -1,7 +1,7 @@
 import { Entypo } from '@expo/vector-icons';
 import { NativeStackScreenProps } from '@react-navigation/native-stack';
 import React, { FC, useCallback, useEffect, useState } from 'react';
-import { Alert, View } from 'react-native';
+import { Alert, FlatList, ListRenderItem, View } from 'react-native';
 import styled from 'styled-components/native';
 import { Screen, Text, Header, Button, Loader } from '../../../components';
 import { SIZES } from '../../../constants';
@@ -9,7 +9,7 @@ import { useStripe, StripeProvider } from '@stripe/stripe-react-native';
 import { db, functions } from '../../../firebase';
 import { getLogsByRequestId } from '../../../redux/logsReducer/logsSlide';
 import { useAppDispatch, useAppSelector } from '../../../redux/store';
-import { RequestTabParamList } from '../../../types';
+import { Log, RequestTabParamList } from '../../../types';
 import { useNetInfo } from '@react-native-community/netinfo';
 
 type Props = NativeStackScreenProps<RequestTabParamList, 'PaymentBreakDown'>;
@@ -57,8 +57,8 @@ const PaymentBreakdown: FC<Props> = ({ route, navigation }) => {
 				alert('Internet connection issues');
 				return;
 			}
-		} catch (error) {
-			console.log('E', error);
+		} catch (error: any) {
+			console.log('E', error.details.message);
 		} finally {
 			setProccessing(false);
 		}
@@ -79,6 +79,15 @@ const PaymentBreakdown: FC<Props> = ({ route, navigation }) => {
 		} catch (error) {
 			console.log(error);
 		}
+	};
+
+	const renderPriceItems: ListRenderItem<Log> = ({ item }) => {
+		return (
+			<Price key={item.id}>
+				<Text>{item.body}</Text>
+				<Text>${item.cost}</Text>
+			</Price>
+		);
 	};
 
 	useEffect(() => {
@@ -110,33 +119,25 @@ const PaymentBreakdown: FC<Props> = ({ route, navigation }) => {
 			<Screen>
 				<Header title='Total BreakDown' canGoBack />
 				<View style={{ flex: 1 }}>
-					<PricesScrollViewContainer>
-						{logs.length > 0 &&
-							logs.map((log) => {
-								return (
-									log.cost! > 0 && (
-										<View
-											style={{
-												justifyContent: 'space-between',
-												alignItems: 'center',
-												flexDirection: 'row',
-												margin: 5,
-												borderRadius: SIZES.radius,
-												padding: SIZES.padding * 0.5,
-												backgroundColor: theme.ASCENT,
-											}}
-											key={log.id}
-										>
-											<Text bold capitalize>
-												{log.body}
-											</Text>
-											<Text bold>${log.cost}</Text>
-										</View>
-									)
-								);
-							})}
-					</PricesScrollViewContainer>
+					<FlatList
+						ListFooterComponent={() => (
+							<View style={{ padding: SIZES.padding * 0.5 }}>
+								<Text caption>
+									Service Fee:${' '}
+									{logs.filter((l) =>
+										l.body === 'service fee' ? l.body === 'service fee' : false
+									).length > 0
+										? logs.filter((l) => l.body === 'service fee')[0].body
+										: 0}
+								</Text>
+							</View>
+						)}
+						data={logs.filter((l) => l.cost! > 0 && l.body !== 'service fee')}
+						keyExtractor={(item) => item.id!}
+						renderItem={renderPriceItems}
+					/>
 				</View>
+
 				<View
 					style={{
 						position: 'absolute',
@@ -177,4 +178,12 @@ const PaymentBreakdown: FC<Props> = ({ route, navigation }) => {
 
 export default PaymentBreakdown;
 
-const PricesScrollViewContainer = styled.ScrollView``;
+const Price = styled.View`
+	align-items: center;
+	justify-content: space-between;
+	background-color: ${({ theme }) => theme.SHADOW_COLOR};
+	flex-direction: row;
+	margin: 5px 10px;
+	padding: 10px;
+	border-radius: 10px;
+`;

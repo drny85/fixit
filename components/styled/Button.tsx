@@ -1,3 +1,4 @@
+import { ViewStyle } from 'react-native';
 import styled from 'styled-components/native';
 
 interface ButtonProps {
@@ -5,6 +6,7 @@ interface ButtonProps {
 	secondary?: boolean;
 	small?: boolean;
 	large?: boolean;
+	style?: ViewStyle;
 	block?: boolean;
 }
 const Button = styled.TouchableOpacity<ButtonProps>`

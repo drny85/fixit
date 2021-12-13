@@ -52,7 +52,7 @@ export type HomeTabParamList = {
 };
 
 export type AdminTabParamList = {
-	Dashboard: NavigatorScreenParams<DashboardStackParams> | undefined;
+	DashboardStack: NavigatorScreenParams<DashboardStackParams> | undefined;
 	ContractorsDashboard:
 		| NavigatorScreenParams<ContractorsDashboardParams>
 		| undefined;
@@ -65,7 +65,7 @@ export type DashboardStackParams = {
 	Dashboard: undefined;
 };
 export type ContractorsDashboardParams = {
-	AdminContractorsDashboard: { contractorStatus: 'new' | 'active' | undefined };
+	AdminContractorsDashboard: { contractorStatus: 'new' | 'active' };
 	AdminContractorDetails: { contractorId: string | undefined };
 };
 export type AdminSettingsDashboardParams = {
@@ -90,6 +90,7 @@ export type AuthTabParamList = {
 	OnBoardingScreen: undefined;
 	SignUpAsContractor: undefined;
 	SignupStatus: { contractor: Contractor };
+	ForgotPasswordScreen: { email: string } | undefined;
 };
 export type RequestTabParamList = {
 	RequestScreen: undefined;

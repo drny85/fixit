@@ -37,7 +37,7 @@ import { sendNotification } from '../../utils/sendNotification';
 type Props = NativeStackScreenProps<RequestTabParamList, 'RequestDetails'>;
 
 const ContractorRequestDetails: FC<Props> = ({ navigation, route }) => {
-	const { loading, logs } = useAppSelector((state) => state.logs);
+	const { logs } = useAppSelector((state) => state.logs);
 	const dispatch = useAppDispatch();
 	let rowRefs = new Map();
 	const [opened, setOpened] = useState<any>(null);
@@ -51,7 +51,6 @@ const ContractorRequestDetails: FC<Props> = ({ navigation, route }) => {
 	const { request } = useAppSelector((state) => state.requests);
 	const theme = useAppSelector((state) => state.theme);
 	const [log, setLog] = useState<string>('');
-	const [logHasPrice, setLogHasPrice] = useState<boolean>(false);
 	const [status, setStatus] = useState<RequestStatus>(undefined);
 
 	const handleStatusChange = async () => {
@@ -85,13 +84,13 @@ const ContractorRequestDetails: FC<Props> = ({ navigation, route }) => {
 		try {
 			if (log === '') {
 				// @ts-ignore
-				alert('Please type a description');
+				alert('Please enter a name for this price');
 				return;
 			}
 
-			if (logHasPrice && logCost === '') {
+			if (logCost === '') {
 				// @ts-ignore
-				alert('Please enter a log cost');
+				alert('Please enter a price / cost');
 				return;
 			}
 
@@ -108,8 +107,6 @@ const ContractorRequestDetails: FC<Props> = ({ navigation, route }) => {
 			if (saved) {
 				setSaving(true);
 				setLogCost('');
-				setLogHasPrice(false);
-
 				setLog('');
 
 				setShowLogModal(false);
@@ -196,48 +193,22 @@ const ContractorRequestDetails: FC<Props> = ({ navigation, route }) => {
 					/>
 					<View style={{ width: SIZES.width }}>
 						<InputField
-							multiline
-							contentStyle={{ minHeight: SIZES.height * 0.2 }}
-							placeholder='Type a brief description about the progress of this request'
+							placeholder='Item Price Name or Description'
 							value={log}
+							autoCapitalize='words'
 							onChangeText={setLog}
 						/>
-					</View>
-					<View
-						style={{
-							justifyContent: 'center',
-							alignItems: 'center',
-							flexDirection: 'row',
-							paddingVertical: SIZES.padding * 0.5,
-						}}
-					>
-						<Switch
-							thumbColor={theme.PRIMARY_BUTTON_COLOR}
-							color={theme.ASCENT}
-							onValueChange={() => {
-								setLogHasPrice((s) => !s);
-							}}
-							value={logHasPrice}
+						<InputField
+							leftIcon={<Text>$</Text>}
+							placeholder='Enter a cost. EX 25.99'
+							value={logCost}
+							keyboardType='numeric'
+							onChangeText={(text) => setLogCost(text)}
 						/>
-						<Text bold>Has a cost?</Text>
 					</View>
-					{logHasPrice && (
-						<Animatable.View
-							style={{ width: '100%' }}
-							animation={logHasPrice ? 'slideInDown' : 'slideOutUp'}
-							easing='ease-in-out'
-						>
-							<InputField
-								leftIcon={<Text>$</Text>}
-								placeholder='Enter a cost for this log'
-								value={logCost}
-								keyboardType='numeric'
-								onChangeText={(text) => setLogCost(text)}
-							/>
-						</Animatable.View>
-					)}
+
 					<Button onPress={handleAddLog}>
-						<Text> {saving ? 'Saving...' : 'Save Log'}</Text>
+						<Text bold> {saving ? 'Saving...' : 'Save Price / Cost'}</Text>
 					</Button>
 				</LogModalContainer>
 			</Overlay>
@@ -393,7 +364,7 @@ const ContractorRequestDetails: FC<Props> = ({ navigation, route }) => {
 					<LogsContainer>
 						<Divider large />
 						<Header
-							title={`Job Logs (${logs?.length ? logs.length : 0})`}
+							title={`Price Items (${logs?.length ? logs.length : 0})`}
 							onPressRight={() => setShowLogModal(true)}
 							iconName='plus-square'
 						/>
@@ -440,7 +411,7 @@ const ContractorRequestDetails: FC<Props> = ({ navigation, route }) => {
 										>
 											<Text bold>{l.body}</Text>
 											{l.cost! > 0 && (
-												<Text style={{ ...FONTS.body4 }}>Cost: ${l.cost}</Text>
+												<Text style={{ ...FONTS.h2 }}>Cost: ${l.cost}</Text>
 											)}
 											<Text caption right>
 												{moment(l.loggedOn).format('llll')}

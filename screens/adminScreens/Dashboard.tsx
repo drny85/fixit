@@ -1,8 +1,8 @@
-import React, { FC } from 'react';
+import React, { FC, useEffect } from 'react';
 
 import styled from 'styled-components/native';
 import { Button, Loader, Screen, Text } from '../../components';
-import { functions } from '../../firebase';
+import { db, functions } from '../../firebase';
 import useContractors from '../../hooks/useContractors';
 import useNotifications from '../../hooks/useNotifications';
 import { AdminTabParamList, DashboardStackParams } from '../../types';
@@ -10,11 +10,14 @@ import { NativeStackScreenProps } from '@react-navigation/native-stack';
 import { View, StyleSheet } from 'react-native';
 import { SIZES } from '../../constants';
 import { useAppSelector } from '../../redux/store';
+import { getRequests } from '../../redux/requestReducer/requestSlide';
+import useRequests from '../../hooks/useRequests';
 
-type Props = NativeStackScreenProps<AdminTabParamList, 'Dashboard'>;
+type Props = NativeStackScreenProps<AdminTabParamList, 'DashboardStack'>;
 
 const Dashboard: FC<Props> = ({ navigation }) => {
 	useNotifications();
+	const { requests, user } = useRequests();
 	const theme = useAppSelector((state) => state.theme);
 	const { users, loading } = useContractors();
 
@@ -32,7 +35,7 @@ const Dashboard: FC<Props> = ({ navigation }) => {
 						})
 					}
 				>
-					<Text>New / Inactive</Text>
+					<Text>Inactive</Text>
 					<Text bold title>
 						{users.filter((u) => !u.isActive && !u.connectedAccountId).length}
 					</Text>
@@ -51,7 +54,7 @@ const Dashboard: FC<Props> = ({ navigation }) => {
 						})
 					}
 				>
-					<Text>Active / No Connected</Text>
+					<Text>No Account</Text>
 					<Text title>
 						{users.filter((u) => u.isActive && !u.connectedAccountId).length}
 					</Text>
@@ -70,12 +73,75 @@ const Dashboard: FC<Props> = ({ navigation }) => {
 						})
 					}
 				>
-					<Text>Active / Connect </Text>
+					<Text>Active</Text>
 					<Text title>
 						{users.filter((u) => u.isActive && u.connectedAccountId).length}
 					</Text>
 				</DashboardCard>
 			</DashboardCardContainer>
+			<ListItem
+				style={[
+					{
+						shadowColor: theme.SHADOW_COLOR,
+					},
+					styles.shadow,
+				]}
+			>
+				<Text>All Accounts!</Text>
+				<Text bold>{users.length}</Text>
+			</ListItem>
+			<ListItem
+				style={[
+					{
+						shadowColor: theme.SHADOW_COLOR,
+					},
+					styles.shadow,
+				]}
+			>
+				<Text>New Requests</Text>
+				<Text bold>
+					{requests.filter((r) => r.status === 'pending').length}
+				</Text>
+			</ListItem>
+			<ListItem
+				style={[
+					{
+						shadowColor: theme.SHADOW_COLOR,
+					},
+					styles.shadow,
+				]}
+			>
+				<Text>Opened Requests</Text>
+				<Text bold>
+					{requests.filter((r) => r.status !== 'completed').length}
+				</Text>
+			</ListItem>
+			<ListItem
+				style={[
+					{
+						shadowColor: theme.SHADOW_COLOR,
+					},
+					styles.shadow,
+				]}
+			>
+				<Text>Waiting for Payment</Text>
+				<Text bold>
+					{requests.filter((r) => r.status === 'waiting for payment').length}
+				</Text>
+			</ListItem>
+			<ListItem
+				style={[
+					{
+						shadowColor: theme.SHADOW_COLOR,
+					},
+					styles.shadow,
+				]}
+			>
+				<Text>Completed / Paid</Text>
+				<Text bold>
+					{requests.filter((r) => r.status === 'completed').length}
+				</Text>
+			</ListItem>
 
 			{/* <Button onPress={makeUserAContractor}>
 				<Text>Make Admin</Text>
@@ -94,6 +160,15 @@ const styles = StyleSheet.create({
 		shadowRadius: 4,
 	},
 });
+
+const ListItem = styled.TouchableOpacity`
+	justify-content: space-between;
+	flex-direction: row;
+	margin: 10px;
+	padding: 10px;
+	border-radius: 10px;
+	background-color: ${({ theme }) => theme.PRIMARY_BUTTON_COLOR};
+`;
 
 const NewContractorView = styled.View`
 	padding: 15px;

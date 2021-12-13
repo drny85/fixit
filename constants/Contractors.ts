@@ -12,6 +12,7 @@ export interface Contractor {
 	connectedAccountId: string | null;
 	isActive: boolean;
 	addedOn: string;
+	activatedOn?: string;
 	address?: string;
 	coords?: { lat: number; lng: number } | null;
 	bio?: string;

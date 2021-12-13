@@ -1,4 +1,5 @@
 import { NativeStackScreenProps } from '@react-navigation/native-stack';
+import moment from 'moment';
 import React, { FC } from 'react';
 import { Alert, View } from 'react-native';
 import { Switch } from 'react-native-elements';
@@ -108,6 +109,10 @@ const AdminContractorDetails: FC<Props> = ({ route }) => {
 				/>
 				<Text ellipsizeMode='tail' numberOfLines={1}>
 					Email: {contrator?.email}
+				</Text>
+				<Text>Signed On: {moment(contrator?.addedOn).format('lll')}</Text>
+				<Text>
+					Activated On: {moment(contrator?.activatedOn).format('lll')}
 				</Text>
 			</Section>
 			<Section>

@@ -1,12 +1,5 @@
 import React, { FC } from 'react';
-import {
-	View,
-	Text,
-	StyleSheet,
-	TextInput,
-	StyleProp,
-	TextStyle,
-} from 'react-native';
+import { View, Text, TextInput, StyleProp, TextStyle } from 'react-native';
 
 import { FONTS, SIZES } from '../constants';
 import { useAppSelector } from '../redux/store';
@@ -20,8 +13,8 @@ interface Props {
 	leftIcon?: React.ReactElement;
 	rightIcon?: React.ReactElement;
 	errorMessage?: string | React.ReactElement;
-	contentStyle?: any;
-	keyboardType?: any;
+	contentStyle?: StyleProp<TextStyle>;
+	keyboardType?: TextInput['props']['keyboardType'];
 	maxLenght?: number;
 	errorStyle?: StyleProp<TextStyle>;
 	multiline?: boolean;
@@ -87,13 +80,15 @@ const InputField: FC<Props> = React.forwardRef(
 					{leftIcon}
 					<TextInput
 						ref={ref as any}
-						style={{
-							...contentStyle,
-							flex: 1,
-							paddingHorizontal: 10,
-							color: theme.mode === 'dark' ? '#ffffff' : '#212121',
-							...FONTS.body3,
-						}}
+						style={[
+							{
+								flex: 1,
+								paddingHorizontal: 10,
+								color: theme.mode === 'dark' ? '#ffffff' : '#212121',
+								...FONTS.body3,
+							},
+							contentStyle,
+						]}
 						value={value}
 						placeholderTextColor={theme.PRIMARY_BUTTON_COLOR}
 						multiline={multiline}
@@ -128,15 +123,5 @@ const InputField: FC<Props> = React.forwardRef(
 		);
 	}
 );
-
-const styles = StyleSheet.create({
-	input: {
-		borderRadius: 15,
-		flexDirection: 'row',
-		paddingVertical: 10,
-		paddingHorizontal: 15,
-		marginVertical: 5,
-	},
-});
 
 export default InputField;

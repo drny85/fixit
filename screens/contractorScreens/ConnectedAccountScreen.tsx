@@ -23,9 +23,8 @@ const ConnectedAccountScreen: FC<Props> = ({ route, navigation }) => {
 	const handleNavigationChanges = async (newNavState: WebViewNavigation) => {
 		const { url, loading } = newNavState;
 		if (url.includes('/reauth')) {
-			console.log('refresh url');
 			const result = await handleActivateAccount();
-			console.log('RESULT', result);
+
 			setCurrentUrl(result!);
 		} else if (url.includes('/return_url')) {
 			//webViewRef.current?.stopLoading();
@@ -44,8 +43,7 @@ const ConnectedAccountScreen: FC<Props> = ({ route, navigation }) => {
 			);
 		} else if (url.includes('/login')) {
 			console.log('retrieve account');
-			webViewRef.current?.stopLoading();
-
+			alert('You already have an account');
 			//const result = await handleActivateAccount();
 			webViewRef.current.injectJavaScript(currentUrl);
 		}
@@ -82,7 +80,7 @@ const ConnectedAccountScreen: FC<Props> = ({ route, navigation }) => {
 				firsName: user?.firstName,
 				lastName: user?.lastName,
 			});
-			console.log(data);
+
 			const { success, result } = data as { success: boolean; result: string };
 
 			if (success) {

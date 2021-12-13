@@ -11,12 +11,14 @@ import { HomeTabParamList } from '../../../types';
 import { getContractors } from '../../../redux/contractorReducer/contractorsSlide';
 import { Contractor } from '../../../constants/Contractors';
 import { NativeStackScreenProps } from '@react-navigation/native-stack';
-import { FlatList, ListRenderItem } from 'react-native';
+import { FlatList, ListRenderItem, View } from 'react-native';
 import { getServices } from '../../../redux/servicesReducer/servicesActions';
 import useNotifications from '../../../hooks/useNotifications';
 import { db } from '../../../firebase';
 import { SIZES } from '../../../constants';
 import useLocation from '../../../hooks/useLocation';
+import LogItem from '../../../components/LogItem';
+import { iteratorSymbol } from 'immer/dist/internal';
 
 type Props = NativeStackScreenProps<HomeTabParamList, 'Home'>;
 
@@ -24,6 +26,7 @@ const Home: FC<Props> = ({ navigation }) => {
 	const dispatch = useAppDispatch();
 	const { services, loading } = useAppSelector((state) => state.services);
 	const theme = useAppSelector((state) => state.theme);
+	const { contractors } = useAppSelector((state) => state.contractors);
 
 	useNotifications();
 	//const { location, errorMsg } = useLocation();
@@ -49,10 +52,21 @@ const Home: FC<Props> = ({ navigation }) => {
 				}}
 				key={service.id + index.toString()}
 			>
-				<Text lightText capitalize large>
-					{service.name}
-				</Text>
-				<FontAwesome name='chevron-right' />
+				<View
+					style={{
+						flexDirection: 'row',
+						alignItems: 'center',
+						justifyContent: 'space-between',
+						width: '100%',
+					}}
+				>
+					<Text lightText capitalize large>
+						{service.name}
+					</Text>
+
+					<FontAwesome name='chevron-right' />
+				</View>
+				{service.description && <Text left>{service.description}</Text>}
 			</ServiceItem>
 		);
 	};
@@ -125,7 +139,7 @@ const ServiceItem = styled.TouchableOpacity`
 	border-radius: 10px;
 	background-color: ${({ theme }) => theme.PRIMARY_BUTTON_COLOR};
 	margin: 8px 15px;
-	flex-direction: row;
+
 	justify-content: space-between;
 	align-items: center;
 `;

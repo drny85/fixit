@@ -50,7 +50,7 @@ const AdminTabsNavigation: FC = () => {
 			}}
 		>
 			<Screen
-				name='Dashboard'
+				name='DashboardStack'
 				component={DashboardStack}
 				options={({ route }) => {
 					const routeName = getFocusedRouteNameFromRoute(route);

@@ -12,7 +12,6 @@ import { Contractor, contractorsData } from '../../../constants/Contractors';
 import { useAppDispatch, useAppSelector } from '../../../redux/store';
 import {
 	getContractorByJob,
-	getContractors,
 	setSelectedContractor,
 } from '../../../redux/contractorReducer/contractorsSlide';
 import { HomeTabParamList } from '../../../types';

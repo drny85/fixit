@@ -1,6 +1,5 @@
 import { createSlice, PayloadAction } from '@reduxjs/toolkit';
 import { Contractor } from '../../constants/Contractors';
-import { addContractor } from './contractorsActions';
 
 interface IState {
 	contractors: Contractor[];

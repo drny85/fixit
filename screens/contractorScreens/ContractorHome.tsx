@@ -21,15 +21,15 @@ const ContractorHome: FC<Props> = ({ navigation }) => {
 	const [processing, setProcessing] = useState<boolean>(false);
 	const [agreed, setAgreed] = useState<boolean>(false);
 
-	console.log(user);
-
 	const handleActivateAccount = async () => {
 		try {
+			setProcessing(true);
 			scrollRef.current;
 			navigation.navigate('ConnectedAccountScreen');
 		} catch (error) {
 			console.log(error);
 		} finally {
+			setProcessing(false);
 		}
 	};
 

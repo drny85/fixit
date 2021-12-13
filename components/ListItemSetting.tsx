@@ -13,7 +13,7 @@ interface Props {
 const ListItemSetting: FC<Props> = ({ title, onPress, containerStyle }) => {
 	return (
 		<TouchableOpacity style={[styles.view, containerStyle]} onPress={onPress}>
-			<Text lightText bold title>
+			<Text lightText bold>
 				{title}
 			</Text>
 			<Entypo name='chevron-right' size={24} color={'#ffffff'} />
