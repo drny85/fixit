@@ -249,13 +249,17 @@ const SignUpScreen: FC<Props> = ({ navigation }) => {
 							setPassword(text.trim());
 						}}
 						rightIcon={
-							<TouchableOpacity onPress={() => setShowPassword(!showPassword)}>
-								<Feather
-									name={showPassword ? 'eye-off' : 'eye'}
-									size={24}
-									color={theme.mode === 'dark' ? '#ffffff' : '#212121'}
-								/>
-							</TouchableOpacity>
+							password.length > 0 ? (
+								<TouchableOpacity
+									onPress={() => setShowPassword(!showPassword)}
+								>
+									<Feather
+										name={showPassword ? 'eye-off' : 'eye'}
+										size={24}
+										color={theme.mode === 'dark' ? '#ffffff' : '#212121'}
+									/>
+								</TouchableOpacity>
+							) : undefined
 						}
 						value={password}
 						errorMessage={passwordError}
@@ -269,19 +273,25 @@ const SignUpScreen: FC<Props> = ({ navigation }) => {
 							setConfirmPassword(text.trim());
 						}}
 						rightIcon={
-							<TouchableOpacity onPress={() => setShowPassword(!showPassword)}>
-								<Feather
-									name={showPassword ? 'eye-off' : 'eye'}
-									size={24}
-									color={theme.mode === 'dark' ? '#ffffff' : '#212121'}
-								/>
-							</TouchableOpacity>
+							confirmPassword.length > 0 ? (
+								<TouchableOpacity
+									onPress={() => setShowPassword(!showPassword)}
+								>
+									<Feather
+										name={showPassword ? 'eye-off' : 'eye'}
+										size={24}
+										color={theme.mode === 'dark' ? '#ffffff' : '#212121'}
+									/>
+								</TouchableOpacity>
+							) : undefined
 						}
 						value={confirmPassword}
 						errorMessage={passwordConfirmError}
 					/>
 					<SubmitRequestButton onPress={handleSignUp}>
-						<Text bold>Sign Up</Text>
+						<Text bold lightText>
+							Sign Up
+						</Text>
 					</SubmitRequestButton>
 				</AuthContainer>
 				<View
@@ -333,7 +343,7 @@ const AuthContainer = styled.View`
 `;
 
 const SubmitRequestButton = styled.TouchableOpacity`
-	background-color: ${({ theme }) => theme.SECONDARY_BUTTON_COLOR};
+	background-color: ${({ theme }) => theme.PRIMARY_BUTTON_COLOR};
 	padding: 15px 30px;
 	justify-content: center;
 	align-items: center;

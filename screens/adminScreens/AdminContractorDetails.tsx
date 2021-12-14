@@ -143,7 +143,7 @@ export default AdminContractorDetails;
 
 const Section = styled.View`
 	border-radius: 15px;
-	background-color: ${({ theme }) => theme.ASCENT};
+	background-color: ${({ theme }) => theme.SHADOW_COLOR};
 	padding: 10px;
 	margin: 8px;
 `;

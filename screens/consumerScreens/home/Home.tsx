@@ -3,7 +3,10 @@ import styled from 'styled-components/native';
 
 import { Text, Screen, Loader } from '../../../components';
 import { Service } from '../../../constants/Services';
-import { setSelectedService } from '../../../redux/servicesReducer/servicesSlide';
+import {
+	populateServices,
+	setSelectedService,
+} from '../../../redux/servicesReducer/servicesSlide';
 import { useAppDispatch, useAppSelector } from '../../../redux/store';
 import { FontAwesome } from '@expo/vector-icons';
 
@@ -15,10 +18,11 @@ import { FlatList, ListRenderItem, View } from 'react-native';
 import { getServices } from '../../../redux/servicesReducer/servicesActions';
 import useNotifications from '../../../hooks/useNotifications';
 import { db } from '../../../firebase';
-import { SIZES } from '../../../constants';
+import { FONTS, SIZES } from '../../../constants';
 import useLocation from '../../../hooks/useLocation';
 import LogItem from '../../../components/LogItem';
 import { iteratorSymbol } from 'immer/dist/internal';
+import { data } from '../../../constants/OnBoardingData';
 
 type Props = NativeStackScreenProps<HomeTabParamList, 'Home'>;
 
@@ -35,6 +39,19 @@ const Home: FC<Props> = ({ navigation }) => {
 		dispatch(setSelectedService(service));
 		navigation.navigate('Contractors', { service });
 	};
+
+	const calculateServicesToShow = React.useCallback(() => {
+		const data: Service[] = [];
+		contractors.forEach((c, i) => {
+			c.services.forEach((s, index) => {
+				if (data.findIndex((d) => d.id === s.id) === -1) {
+					data.push(s);
+				}
+			});
+		});
+
+		return data.sort((a, b) => (a.name! > b.name! ? 1 : -1));
+	}, [dispatch, contractors.length]);
 
 	const renderServices: ListRenderItem<Service> = ({
 		item: service,
@@ -66,14 +83,22 @@ const Home: FC<Props> = ({ navigation }) => {
 
 					<FontAwesome name='chevron-right' />
 				</View>
-				{service.description && <Text left>{service.description}</Text>}
+				{service.description && (
+					<View style={{ padding: 5, width: '100%' }}>
+						<Text lightText left style={{ ...FONTS.body4 }}>
+							{service.description}
+						</Text>
+					</View>
+				)}
 			</ServiceItem>
 		);
 	};
 
 	useEffect(() => {
-		dispatch(getServices());
-		//MODIFY LATER TO ONLY GET ACTIVE CONTRATORS
+		if (contractors.length > 0) {
+			dispatch(populateServices(calculateServicesToShow()));
+		}
+
 		const sub = db
 			.collection('users')
 			.where('role', '==', 'contractor')
@@ -91,11 +116,8 @@ const Home: FC<Props> = ({ navigation }) => {
 					)
 				);
 			});
-
 		return sub;
-
-		// return sub
-	}, [dispatch]);
+	}, [dispatch, contractors.length]);
 
 	if (loading) return <Loader />;
 	return (

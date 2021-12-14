@@ -35,7 +35,7 @@ const Dashboard: FC<Props> = ({ navigation }) => {
 						})
 					}
 				>
-					<Text>Inactive</Text>
+					<Text caption>Inactive</Text>
 					<Text bold title>
 						{users.filter((u) => !u.isActive && !u.connectedAccountId).length}
 					</Text>
@@ -54,7 +54,7 @@ const Dashboard: FC<Props> = ({ navigation }) => {
 						})
 					}
 				>
-					<Text>No Account</Text>
+					<Text caption>No Account</Text>
 					<Text title>
 						{users.filter((u) => u.isActive && !u.connectedAccountId).length}
 					</Text>
@@ -73,7 +73,7 @@ const Dashboard: FC<Props> = ({ navigation }) => {
 						})
 					}
 				>
-					<Text>Active</Text>
+					<Text caption>Active</Text>
 					<Text title>
 						{users.filter((u) => u.isActive && u.connectedAccountId).length}
 					</Text>

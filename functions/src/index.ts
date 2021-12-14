@@ -24,6 +24,7 @@ interface Log {
 	cost: number | null;
 	loggedOn: string;
 	price_id?: string;
+	connectedId: string;
 	customer_id?: string;
 }
 
@@ -41,8 +42,9 @@ exports.createPaymentIntent = functions.https.onCall(
 			const logs = await getLogs(requestId);
 			if (logs.length === 0) return { success: false, result: 'not data' };
 			const customer_id = logs[0].customer_id;
-			const { result, success } = await getContractorConnectedId(requestId);
-			if (!success)
+			const connectedId = logs[0].connectedId;
+
+			if (!connectedId)
 				return {
 					success: false,
 					result: `no connected account id found for ${context?.auth?.token.email}`,
@@ -61,7 +63,7 @@ exports.createPaymentIntent = functions.https.onCall(
 				receipt_email: email,
 				application_fee_amount: Math.round(totalPrice()) * 0.08 * 100,
 				transfer_data: {
-					destination: result,
+					destination: connectedId,
 				},
 
 				metadata: {
@@ -302,7 +304,7 @@ exports.sendNotificationOnNewRequest = functions.firestore
 				body: JSON.stringify({
 					to: token,
 					title: `New Job Request`,
-					body: `${data.customer.name} just submitted a request, \n Request For: ${data.service.name}`,
+					body: `${data.customer.firstName} ${data.customer.lastName} just submitted a request, \n Request For: ${data.service.name}`,
 					data: { notificationType: 'new_request', requestId },
 				}),
 			});
@@ -348,7 +350,6 @@ exports.createStripeProduct = functions.firestore
 			const price = await stripe.prices.create({
 				product: product.id,
 				unit_amount: cost,
-				tax_behavior: 'exclusive',
 				currency: 'usd',
 			});
 
@@ -356,6 +357,7 @@ exports.createStripeProduct = functions.firestore
 				{
 					price_id: price.id,
 					customer_id: customer_id,
+					connectedId: data.connectedId,
 				},
 				{ merge: true }
 			);
@@ -606,26 +608,6 @@ const getLogs = async (requestId: string) => {
 		return results;
 	} catch (error) {
 		return [];
-	}
-};
-
-const getContractorConnectedId = async (requestId: string) => {
-	try {
-		const requestObject = await admin
-			.firestore()
-			.collection('requests')
-			.doc(requestId)
-			.get();
-
-		const contratorObject = await requestObject.data()?.contractor;
-
-		if (!contratorObject) return { success: false, result: null };
-		const connnectId = contratorObject.connectedAccountId;
-		if (!connnectId) return { success: false, result: null };
-
-		return { success: true, result: connnectId };
-	} catch (error) {
-		return { success: false, result: null };
 	}
 };
 

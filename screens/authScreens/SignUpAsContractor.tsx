@@ -418,15 +418,17 @@ const SignUpAsContractor: FC<Props> = ({ navigation }) => {
 								}}
 								value={password}
 								rightIcon={
-									<TouchableOpacity
-										onPress={() => setShowPassword(!showPassword)}
-									>
-										<Feather
-											name={showPassword ? 'eye-off' : 'eye'}
-											size={24}
-											color={theme.mode === 'dark' ? '#ffffff' : '#212121'}
-										/>
-									</TouchableOpacity>
+									password.length > 0 ? (
+										<TouchableOpacity
+											onPress={() => setShowPassword(!showPassword)}
+										>
+											<Feather
+												name={showPassword ? 'eye-off' : 'eye'}
+												size={24}
+												color={theme.mode === 'dark' ? '#ffffff' : '#212121'}
+											/>
+										</TouchableOpacity>
+									) : undefined
 								}
 								errorMessage={passwordError}
 							/>
@@ -440,15 +442,17 @@ const SignUpAsContractor: FC<Props> = ({ navigation }) => {
 								}}
 								value={confirmPassword}
 								rightIcon={
-									<TouchableOpacity
-										onPress={() => setShowPassword(!showPassword)}
-									>
-										<Feather
-											name={showPassword ? 'eye-off' : 'eye'}
-											size={24}
-											color={theme.mode === 'dark' ? '#ffffff' : '#212121'}
-										/>
-									</TouchableOpacity>
+									confirmPassword.length > 0 ? (
+										<TouchableOpacity
+											onPress={() => setShowPassword(!showPassword)}
+										>
+											<Feather
+												name={showPassword ? 'eye-off' : 'eye'}
+												size={24}
+												color={theme.mode === 'dark' ? '#ffffff' : '#212121'}
+											/>
+										</TouchableOpacity>
+									) : undefined
 								}
 								errorMessage={passwordConfirmError}
 							/>
@@ -463,10 +467,10 @@ const SignUpAsContractor: FC<Props> = ({ navigation }) => {
 									style={{
 										width: 'auto',
 										alignSelf: 'center',
-										backgroundColor: theme.SECONDARY_BUTTON_COLOR,
+										backgroundColor: theme.PRIMARY_BUTTON_COLOR,
 									}}
 								>
-									<Text bold>
+									<Text bold lightText>
 										{servicesSelected.length > 0
 											? 'Add / Remove Jobs'
 											: 'Add Jobs'}
@@ -476,7 +480,9 @@ const SignUpAsContractor: FC<Props> = ({ navigation }) => {
 							<Divider large />
 
 							<SubmitRequestButton onPress={handleSignUp}>
-								<Text bold>Sign Up</Text>
+								<Text bold lightText>
+									Sign Up
+								</Text>
 							</SubmitRequestButton>
 							<View
 								style={{
@@ -522,7 +528,7 @@ const AuthContainer = styled.View`
 `;
 
 const SubmitRequestButton = styled.TouchableOpacity`
-	background-color: ${({ theme }) => theme.SECONDARY_BUTTON_COLOR};
+	background-color: ${({ theme }) => theme.PRIMARY_BUTTON_COLOR};
 	padding: 15px 30px;
 	justify-content: center;
 	align-items: center;

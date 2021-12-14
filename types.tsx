@@ -135,6 +135,7 @@ export interface Log {
 	id?: string;
 	requestId: string;
 	body: string;
+	connectedId: string;
 	cost: number | null;
 	loggedOn: string;
 	price_id?: string;

@@ -22,12 +22,10 @@ const AdminSettings = () => {
 				alert('Both fields are required');
 				return;
 			}
-			await db
-				.collection('services')
-				.add({
-					name: serviceName.toLowerCase(),
-					description: serviceDescription,
-				});
+			await db.collection('services').add({
+				name: serviceName.toLowerCase(),
+				description: serviceDescription,
+			});
 			setServiceName('');
 			setServiceDescription('');
 			setShowModal(false);
@@ -66,7 +64,7 @@ const AdminSettings = () => {
 					onPress={() => setShowModal(true)}
 					containerStyle={{
 						shadowColor: theme.SHADOW_COLOR,
-						backgroundColor: theme.ASCENT,
+						backgroundColor: theme.PRIMARY_BUTTON_COLOR,
 					}}
 				/>
 			</View>

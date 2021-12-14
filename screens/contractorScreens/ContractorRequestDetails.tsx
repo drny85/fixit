@@ -101,6 +101,7 @@ const ContractorRequestDetails: FC<Props> = ({ navigation, route }) => {
 				body: log,
 				cost: price,
 				requestId: request?.id!,
+				connectedId: request?.contractor?.connectedAccountId!,
 			};
 
 			const saved = await addLog(logToSave);

@@ -37,21 +37,21 @@ const ContractorHome: FC<Props> = ({ navigation }) => {
 		<Screen center>
 			{!user?.connectedAccountId && (
 				<ScrollView ref={scrollRef} style={{ flex: 1, padding: 10 }}>
-					<Text center title>
+					<Text animation='fadeInDown' duration={400} center title>
 						Congratulations!
 					</Text>
-					<Text>
+					<Text animation='fadeInLeft' delay={400}>
 						Your account has been activated but you must provide some personal
 						information in order for you to start receiving payments.
 					</Text>
 					<Divider />
-					<Text>
-						Customers wont be able to request services from you unless they cant
+					<Text animation='fadeInRight' delay={600}>
+						Customers wont be able to request services from you unless they can
 						pay you
 					</Text>
 					<Divider />
 
-					<Text bold center>
+					<Text animation='fadeInUp' bold center>
 						You will be redirected to a secure link. Please have ready the
 						following information for the next step:
 					</Text>

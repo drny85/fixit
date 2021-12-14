@@ -397,7 +397,7 @@ const RequestServiceScreen: FC<Props> = ({ route, navigation }) => {
 					<Text bold center>
 						Job Selected
 					</Text>
-					<Skill style={{ backgroundColor: theme.ASCENT }} center>
+					<Skill style={{ backgroundColor: theme.PRIMARY_BUTTON_COLOR }} center>
 						<Text capitalize bold>
 							{selectedService?.name}
 						</Text>
@@ -420,8 +420,8 @@ const RequestServiceScreen: FC<Props> = ({ route, navigation }) => {
 													backgroundColor:
 														selectedService!.name!.toLowerCase() ===
 														s!.name!.toLowerCase()
-															? theme.ASCENT
-															: theme.SECONDARY_BUTTON_COLOR,
+															? theme.PRIMARY_BUTTON_COLOR
+															: theme.SHADOW_COLOR,
 													borderWidth:
 														selectedService!.name!.toLowerCase() ===
 														s!.name!.toLowerCase()
@@ -431,7 +431,7 @@ const RequestServiceScreen: FC<Props> = ({ route, navigation }) => {
 														selectedService!.name!.toLowerCase() ===
 														s!.name!.toLowerCase()
 															? theme.PRIMARY_BUTTON_COLOR
-															: '',
+															: theme.SHADOW_COLOR,
 												}}
 												key={index.toString()}
 											>
@@ -462,7 +462,7 @@ const RequestServiceScreen: FC<Props> = ({ route, navigation }) => {
 						style={{
 							alignItems: 'center',
 							justifyContent: 'center',
-							backgroundColor: theme.SECONDARY_BUTTON_COLOR,
+							backgroundColor: theme.PRIMARY_BUTTON_COLOR,
 							paddingHorizontal: 10,
 							paddingVertical: 10,
 							borderRadius: SIZES.radius,
@@ -494,26 +494,30 @@ const RequestServiceScreen: FC<Props> = ({ route, navigation }) => {
 							onPress={() => dispatch(setContactmethod('phone'))}
 							style={{
 								backgroundColor:
-									contactMethod === 'phone' ? theme.ASCENT : '#ffffff',
+									contactMethod === 'phone'
+										? theme.PRIMARY_BUTTON_COLOR
+										: theme.SHADOW_COLOR,
 								borderColor: theme.ASCENT,
 								borderWidth: 1,
 
 								flex: 1,
 							}}
 						>
-							<Text darkText={contactMethod !== 'phone'}>Phone</Text>
+							<Text>Phone</Text>
 						</Skill>
 						<Skill
 							onPress={() => dispatch(setContactmethod('email'))}
 							style={{
 								backgroundColor:
-									contactMethod === 'email' ? theme.ASCENT : '#ffffff',
+									contactMethod === 'email'
+										? theme.PRIMARY_BUTTON_COLOR
+										: theme.SHADOW_COLOR,
 								borderColor: theme.ASCENT,
 								borderWidth: 1,
 								flex: 1,
 							}}
 						>
-							<Text darkText={contactMethod !== 'email'}>Email</Text>
+							<Text>Email</Text>
 						</Skill>
 					</View>
 				</PrefferedContactMethodView>
@@ -733,7 +737,7 @@ const Skill = styled.TouchableOpacity<{ center?: boolean }>`
 `;
 
 const SubmitRequestButton = styled.TouchableOpacity`
-	background-color: ${({ theme }) => theme.SECONDARY_BUTTON_COLOR};
+	background-color: ${({ theme }) => theme.PRIMARY_BUTTON_COLOR};
 	padding: 15px 30px;
 	justify-content: center;
 	align-items: center;

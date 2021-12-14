@@ -39,6 +39,10 @@ const servicesSlide = createSlice({
 			state.loading = false;
 			state.servicesSelected = payload;
 		},
+		populateServices: (state, { payload }) => {
+			state.loading = false;
+			state.services = payload;
+		},
 	},
 	extraReducers: (builder) => {
 		builder.addCase(getServices.pending, (state) => {
@@ -54,7 +58,11 @@ const servicesSlide = createSlice({
 	},
 });
 
-export const { setSelectedService, setContactmethod, setServicesSelected } =
-	servicesSlide.actions;
+export const {
+	setSelectedService,
+	setContactmethod,
+	setServicesSelected,
+	populateServices,
+} = servicesSlide.actions;
 
 export default servicesSlide.reducer;

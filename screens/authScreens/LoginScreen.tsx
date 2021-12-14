@@ -169,13 +169,17 @@ const LoginScreen: FC<Props> = ({ navigation }) => {
 						value={password}
 						errorMessage={passwordError}
 						rightIcon={
-							<TouchableOpacity onPress={() => setShowPassword(!showPassword)}>
-								<Feather
-									name={showPassword ? 'eye-off' : 'eye'}
-									size={24}
-									color={theme.mode === 'dark' ? '#ffffff' : '#212121'}
-								/>
-							</TouchableOpacity>
+							password.length > 0 ? (
+								<TouchableOpacity
+									onPress={() => setShowPassword(!showPassword)}
+								>
+									<Feather
+										name={showPassword ? 'eye-off' : 'eye'}
+										size={24}
+										color={theme.mode === 'dark' ? '#ffffff' : '#212121'}
+									/>
+								</TouchableOpacity>
+							) : undefined
 						}
 						leftIcon={
 							<MaterialIcons
@@ -231,7 +235,7 @@ const AuthContainer = styled.View`
 `;
 
 const SubmitRequestButton = styled.TouchableOpacity`
-	background-color: ${({ theme }) => theme.SECONDARY_BUTTON_COLOR};
+	background-color: ${({ theme }) => theme.PRIMARY_BUTTON_COLOR};
 	padding: 15px 30px;
 	justify-content: center;
 	align-items: center;

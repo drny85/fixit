@@ -11,7 +11,7 @@ interface Props {
 	value: string;
 	onChangeText: (value: string) => void;
 	leftIcon?: React.ReactElement;
-	rightIcon?: React.ReactElement;
+	rightIcon?: React.ReactElement | undefined;
 	errorMessage?: string | React.ReactElement;
 	contentStyle?: StyleProp<TextStyle>;
 	keyboardType?: TextInput['props']['keyboardType'];
@@ -90,7 +90,7 @@ const InputField: FC<Props> = React.forwardRef(
 							contentStyle,
 						]}
 						value={value}
-						placeholderTextColor={theme.PRIMARY_BUTTON_COLOR}
+						placeholderTextColor={theme.TEXT_COLOR}
 						multiline={multiline}
 						keyboardType={keyboardType}
 						autoCorrect={false}

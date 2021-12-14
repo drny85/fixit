@@ -86,7 +86,7 @@ const UserCard = styled.TouchableOpacity`
 	padding: 25px 15px;
 	margin: 10px 5px;
 	border-radius: 15px;
-	background-color: ${({ theme }) => theme.ASCENT};
+	background-color: ${({ theme }) => theme.SHADOW_COLOR};
 `;
 
 const RightContainer = styled.View``;
