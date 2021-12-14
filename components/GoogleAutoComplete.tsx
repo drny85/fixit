@@ -80,7 +80,7 @@ const GoogleAutoComplete: FC<Props> = React.forwardRef(
 					onPress={onPress}
 					textInputProps={{
 						//InputComp: InputField,
-						placeholderTextColor: theme.PRIMARY_BUTTON_COLOR,
+						placeholderTextColor: theme.TEXT_COLOR,
 						leftIcon: { type: 'font-awesome', name: 'chevron-left' },
 						errorStyle: { color: 'red' },
 					}}

@@ -83,7 +83,7 @@ const RequestServiceScreen: FC<Props> = ({ route, navigation }) => {
 				<Overlay>
 					<View
 						style={{
-							backgroundColor: theme.SECONDARY_BUTTON_COLOR,
+							backgroundColor: theme.BACKGROUND_COLOR,
 							position: 'absolute',
 							left: 0,
 							right: 0,
@@ -111,13 +111,12 @@ const RequestServiceScreen: FC<Props> = ({ route, navigation }) => {
 								</Text>
 							</TouchableHighlight>
 							<TouchableHighlight
-								underlayColor={theme.SECONDARY_BUTTON_COLOR}
+								underlayColor={theme.BACKGROUND_COLOR}
 								onPress={() => setPickAddress(false)}
 							>
 								<Text
 									style={{
 										...FONTS.h3,
-										color: '#ffffff',
 									}}
 								>
 									Done
@@ -127,7 +126,7 @@ const RequestServiceScreen: FC<Props> = ({ route, navigation }) => {
 						<View
 							style={{
 								flex: 1,
-								marginTop: 20,
+								marginTop: 25,
 
 								width: '100%',
 								backgroundColor: theme.BACKGROUND_COLOR,
@@ -462,7 +461,7 @@ const RequestServiceScreen: FC<Props> = ({ route, navigation }) => {
 						style={{
 							alignItems: 'center',
 							justifyContent: 'center',
-							backgroundColor: theme.PRIMARY_BUTTON_COLOR,
+							backgroundColor: theme.SHADOW_COLOR,
 							paddingHorizontal: 10,
 							paddingVertical: 10,
 							borderRadius: SIZES.radius,
