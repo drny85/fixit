@@ -1,17 +1,22 @@
-import React, { FC, useEffect, useRef, useState } from 'react';
+import React, { FC, useRef, useState } from 'react';
 import { ScrollView, View } from 'react-native';
-import { Button, Divider, Screen, Text } from '../../components';
-import { functions } from '../../firebase';
-import useNotifications from '../../hooks/useNotifications';
-import { useAppSelector } from '../../redux/store';
-import * as Linking from 'expo-linking';
+import { Button, Divider, Screen, Text } from '../../../components';
+import useNotifications from '../../../hooks/useNotifications';
+import { useAppSelector } from '../../../redux/store';
 import { NativeStackScreenProps } from '@react-navigation/native-stack';
-import { HomeTabParamList } from '../../types';
+import { ContractorNavigationRootParams } from '../../../types';
 import styled from 'styled-components/native';
 import { CheckBox } from 'react-native-elements';
-import { FONTS } from '../../constants';
+import { FONTS, SIZES } from '../../../constants';
 
-type Props = NativeStackScreenProps<HomeTabParamList, 'ContractorScreen'>;
+import SmallCard from '../../../components/SmallCard';
+import useRequests from '../../../hooks/useRequests';
+import { Request } from '../../../redux/requestReducer/requestActions';
+
+type Props = NativeStackScreenProps<
+	ContractorNavigationRootParams,
+	'ContractorHomeStack'
+>;
 
 const ContractorHome: FC<Props> = ({ navigation }) => {
 	useNotifications();
@@ -20,17 +25,24 @@ const ContractorHome: FC<Props> = ({ navigation }) => {
 	const { user } = useAppSelector((state) => state.auth);
 	const [processing, setProcessing] = useState<boolean>(false);
 	const [agreed, setAgreed] = useState<boolean>(false);
+	const { requests } = useRequests();
 
 	const handleActivateAccount = async () => {
 		try {
 			setProcessing(true);
 			scrollRef.current;
-			navigation.navigate('ConnectedAccountScreen');
+			navigation.navigate('ContractorHomeStack', {
+				screen: 'ConnectedAccountScreen',
+			});
 		} catch (error) {
 			console.log(error);
 		} finally {
 			setProcessing(false);
 		}
+	};
+
+	const requestCount = (status: Request['status']) => {
+		return requests.filter((r) => r.status === status).length.toString();
 	};
 
 	return (
@@ -107,7 +119,55 @@ const ContractorHome: FC<Props> = ({ navigation }) => {
 			)}
 			{user?.connectedAccountId && (
 				<ScrollView style={{ flex: 1 }}>
-					<Text>Welcome</Text>
+					<Text bold center>
+						Requests
+					</Text>
+					<View style={{ flexDirection: 'row', width: SIZES.width }}>
+						<SmallCard
+							title='New'
+							subtitle={requestCount('pending')}
+							onPress={() => {
+								navigation.navigate('ContractorRequestStack', {
+									screen: 'ContractorResquestsScreen',
+									params: { requestsStatus: 'pending' },
+								});
+							}}
+						/>
+
+						<SmallCard
+							title='Waiting Payment'
+							subtitle={requestCount('waiting for payment')}
+							onPress={() => {
+								navigation.navigate('ContractorRequestStack', {
+									screen: 'ContractorResquestsScreen',
+									params: { requestsStatus: 'waiting for payment' },
+								});
+							}}
+						/>
+					</View>
+					<View style={{ flexDirection: 'row', width: SIZES.width }}>
+						<SmallCard
+							title='In Progress'
+							subtitle={requestCount('working on')}
+							onPress={() => {
+								navigation.navigate('ContractorRequestStack', {
+									screen: 'ContractorResquestsScreen',
+									params: { requestsStatus: 'working on' },
+								});
+							}}
+						/>
+
+						<SmallCard
+							title='Completed'
+							subtitle={requestCount('completed')}
+							onPress={() => {
+								navigation.navigate('ContractorRequestStack', {
+									screen: 'ContractorResquestsScreen',
+									params: { requestsStatus: 'completed' },
+								});
+							}}
+						/>
+					</View>
 				</ScrollView>
 			)}
 		</Screen>

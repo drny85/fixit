@@ -15,7 +15,7 @@ export const COLORS = {
 	background: '#FFFFFF',
 	ascent: '#ffe8d6',
 	card: '#04395e',
-	placeHolderTextColor: '#808080',
+	placeHolderTextColor: '#adb5bd70',
 	green: '#005f73',
 	tile: '#ecf0f1',
 	blue: '#337DFF',

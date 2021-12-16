@@ -2,7 +2,7 @@ import { createAsyncThunk } from '@reduxjs/toolkit';
 import { Service } from '../../constants/Services';
 import { Contractor } from '../../constants/Contractors';
 import { db } from '../../firebase';
-import { Log, User } from '../../types';
+import { User } from '../../types';
 import { saveOrChangeImageToDatabase } from '../../utils/saveImages';
 import { RootState } from '../store';
 
@@ -19,6 +19,7 @@ export interface Request {
 	apt: string | null;
 	paid: boolean;
 	amount?: number;
+	messagesEnable?: boolean | true;
 	amountPaid?: number;
 	payment_intent_id?: string;
 	paidOn?: string;

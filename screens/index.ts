@@ -11,7 +11,7 @@ import OnBoardingScreen from './authScreens/OnBoardingScreen';
 import SignUpAsContractor from './authScreens/SignUpAsContractor';
 import ContractorByJob from './consumerScreens/home/ContractorByJob';
 import ContractorScreen from './consumerScreens/home/ContractorsScreen';
-import Messages from './messages/Messages';
+import Messages from './consumerScreens/messages/Messages';
 export {
 	Home,
 	ContractorByJob,

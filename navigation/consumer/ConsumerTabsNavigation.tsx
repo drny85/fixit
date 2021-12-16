@@ -1,4 +1,4 @@
-import { RootTabParamList } from '../../types';
+import { ContractorNavigationRootParams, RootTabParamList } from '../../types';
 import React, { FC } from 'react';
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 
@@ -9,6 +9,8 @@ import { Messages, SettingsScreen } from '../../screens';
 import { getFocusedRouteNameFromRoute } from '@react-navigation/native';
 import RequestStack from './RequestStack';
 import HomeStack from './HomeStack';
+import ConsumerProfileStack from './ConsumerProfileStack';
+import ConsumerMessageStack from './ConsumerMessageStack';
 
 function TabBarIcon(props: {
 	name: React.ComponentProps<typeof FontAwesome>['name'];
@@ -26,7 +28,8 @@ function TabBarIcon(props: {
 	);
 }
 
-const { Navigator, Screen } = createBottomTabNavigator<RootTabParamList>();
+const { Navigator, Screen } =
+	createBottomTabNavigator<ContractorNavigationRootParams>();
 
 const ConsumerTabsNavigation: FC = () => {
 	const theme = useAppSelector((state) => state.theme);
@@ -46,7 +49,7 @@ const ConsumerTabsNavigation: FC = () => {
 			}}
 		>
 			<Screen
-				name='HomeStacks'
+				name='ContractorHomeStack'
 				component={HomeStack}
 				options={({ route }) => {
 					const routeName = getFocusedRouteNameFromRoute(route);
@@ -61,7 +64,7 @@ const ConsumerTabsNavigation: FC = () => {
 				}}
 			/>
 			<Screen
-				name='RequestStacks'
+				name='ContractorRequestStack'
 				component={RequestStack}
 				options={{
 					title: user?.role === 'consumer' ? 'My Requests' : 'My Jobs',
@@ -71,8 +74,8 @@ const ConsumerTabsNavigation: FC = () => {
 				}}
 			/>
 			<Screen
-				name='CartStack'
-				component={Messages}
+				name='ContractorMessageStack'
+				component={ConsumerMessageStack}
 				options={{
 					title: 'Messages',
 					tabBarIcon: ({ focused, color, size }) => (
@@ -81,8 +84,8 @@ const ConsumerTabsNavigation: FC = () => {
 				}}
 			/>
 			<Screen
-				name='ProfileStack'
-				component={SettingsScreen}
+				name='ContractorProfileStack'
+				component={ConsumerProfileStack}
 				options={{
 					title: 'Profile',
 					tabBarIcon: ({ focused, color, size }) => <TabBarIcon name='user' />,

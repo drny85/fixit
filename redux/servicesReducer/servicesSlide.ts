@@ -1,7 +1,6 @@
 import { createSlice, PayloadAction, createAsyncThunk } from '@reduxjs/toolkit';
 import { Service } from '../../constants/Services';
-import { db } from '../../firebase';
-import { AppThunk } from '../store';
+
 import { getServices } from './servicesActions';
 
 interface IState {
@@ -40,6 +39,7 @@ const servicesSlide = createSlice({
 			state.servicesSelected = payload;
 		},
 		populateServices: (state, { payload }) => {
+			console.log('POPULATE');
 			state.loading = false;
 			state.services = payload;
 		},

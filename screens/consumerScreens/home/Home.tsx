@@ -15,14 +15,10 @@ import { getContractors } from '../../../redux/contractorReducer/contractorsSlid
 import { Contractor } from '../../../constants/Contractors';
 import { NativeStackScreenProps } from '@react-navigation/native-stack';
 import { FlatList, ListRenderItem, View } from 'react-native';
-import { getServices } from '../../../redux/servicesReducer/servicesActions';
 import useNotifications from '../../../hooks/useNotifications';
 import { db } from '../../../firebase';
 import { FONTS, SIZES } from '../../../constants';
 import useLocation from '../../../hooks/useLocation';
-import LogItem from '../../../components/LogItem';
-import { iteratorSymbol } from 'immer/dist/internal';
-import { data } from '../../../constants/OnBoardingData';
 
 type Props = NativeStackScreenProps<HomeTabParamList, 'Home'>;
 
@@ -51,7 +47,7 @@ const Home: FC<Props> = ({ navigation }) => {
 		});
 
 		return data.sort((a, b) => (a.name! > b.name! ? 1 : -1));
-	}, [dispatch, contractors.length]);
+	}, [contractors.length]);
 
 	const renderServices: ListRenderItem<Service> = ({
 		item: service,
@@ -66,12 +62,14 @@ const Home: FC<Props> = ({ navigation }) => {
 					shadowColor: theme.SHADOW_COLOR,
 					shadowOpacity: 0.4,
 					shadowRadius: 6,
+					flexDirection: 'row',
+					alignItems: 'center',
+					justifyContent: 'space-between',
 				}}
 				key={service.id + index.toString()}
 			>
 				<View
 					style={{
-						flexDirection: 'row',
 						alignItems: 'center',
 						justifyContent: 'space-between',
 						width: '100%',
@@ -80,25 +78,22 @@ const Home: FC<Props> = ({ navigation }) => {
 					<Text lightText capitalize large>
 						{service.name}
 					</Text>
-
-					<FontAwesome name='chevron-right' />
+					{service.description && (
+						<View style={{ padding: 5, width: '100%' }}>
+							<Text lightText style={{ ...FONTS.body4 }}>
+								{service.description}
+							</Text>
+						</View>
+					)}
 				</View>
-				{service.description && (
-					<View style={{ padding: 5, width: '100%' }}>
-						<Text lightText left style={{ ...FONTS.body4 }}>
-							{service.description}
-						</Text>
-					</View>
-				)}
+
+				<FontAwesome name='chevron-right' size={16} color={'#ffffff'} />
 			</ServiceItem>
 		);
 	};
 
 	useEffect(() => {
-		if (contractors.length > 0) {
-			dispatch(populateServices(calculateServicesToShow()));
-		}
-
+		dispatch(populateServices(calculateServicesToShow()));
 		const sub = db
 			.collection('users')
 			.where('role', '==', 'contractor')
@@ -116,6 +111,7 @@ const Home: FC<Props> = ({ navigation }) => {
 					)
 				);
 			});
+
 		return sub;
 	}, [dispatch, contractors.length]);
 

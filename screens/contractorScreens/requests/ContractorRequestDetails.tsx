@@ -1,7 +1,7 @@
 import { NativeStackScreenProps } from '@react-navigation/native-stack';
 import moment from 'moment';
 import React, { FC, useCallback, useEffect, useState } from 'react';
-import { TouchableWithoutFeedback, View } from 'react-native';
+import { TouchableOpacity, TouchableWithoutFeedback, View } from 'react-native';
 import styled from 'styled-components/native';
 import * as Animatable from 'react-native-animatable';
 import {
@@ -13,32 +13,42 @@ import {
 	PhoneCall,
 	Screen,
 	Text,
-} from '../../components';
-import CheckBoxItem from '../../components/CheckBoxItem';
-import EmailLink from '../../components/EmailLink';
-import ImagesContainer from '../../components/ImagesContainer';
-import SwipableItem from '../../components/SwipableItem';
-import { FONTS, SIZES } from '../../constants';
-import { Contractor } from '../../constants/Contractors';
-import { STATUS } from '../../constants/DispositonStatus';
+} from '../../../components';
+import CheckBoxItem from '../../../components/CheckBoxItem';
+import EmailLink from '../../../components/EmailLink';
+import ImagesContainer from '../../../components/ImagesContainer';
+import SwipableItem from '../../../components/SwipableItem';
+import { FONTS, SIZES } from '../../../constants';
+import { Contractor } from '../../../constants/Contractors';
+import { STATUS } from '../../../constants/DispositonStatus';
 import {
 	Request,
 	updateRequest,
-} from '../../redux/requestReducer/requestActions';
-import { useAppDispatch, useAppSelector } from '../../redux/store';
-import { Log, RequestStatus, RequestTabParamList } from '../../types';
+} from '../../../redux/requestReducer/requestActions';
+import { useAppDispatch, useAppSelector } from '../../../redux/store';
+import {
+	ContractorRequestStackParams,
+	Log,
+	RequestStatus,
+	RequestTabParamList,
+} from '../../../types';
 import { Switch } from 'react-native-elements';
-import { db, functions } from '../../firebase';
-import { getLogsByRequestId } from '../../redux/logsReducer/logsSlide';
-import { addLog, deleteLog } from '../../redux/logsReducer/logsActions';
-import { setRequest } from '../../redux/requestReducer/requestSlide';
-import { sendNotification } from '../../utils/sendNotification';
+import { db, functions } from '../../../firebase';
+import { getLogsByRequestId } from '../../../redux/logsReducer/logsSlide';
+import { addLog, deleteLog } from '../../../redux/logsReducer/logsActions';
+import { setRequest } from '../../../redux/requestReducer/requestSlide';
+import { sendNotification } from '../../../utils/sendNotification';
+import { Entypo } from '@expo/vector-icons';
 
-type Props = NativeStackScreenProps<RequestTabParamList, 'RequestDetails'>;
+type Props = NativeStackScreenProps<
+	ContractorRequestStackParams,
+	'ContractorRequestDetails'
+>;
 
 const ContractorRequestDetails: FC<Props> = ({ navigation, route }) => {
 	const { logs } = useAppSelector((state) => state.logs);
 	const dispatch = useAppDispatch();
+	console.log('PARAMS', route.params);
 	let rowRefs = new Map();
 	const [opened, setOpened] = useState<any>(null);
 	const [saving, setSaving] = useState<boolean>(false);
@@ -52,6 +62,10 @@ const ContractorRequestDetails: FC<Props> = ({ navigation, route }) => {
 	const theme = useAppSelector((state) => state.theme);
 	const [log, setLog] = useState<string>('');
 	const [status, setStatus] = useState<RequestStatus>(undefined);
+
+	const handleGoToMessageScreen = () => {
+		navigation.navigate('ContractorResquestsScreen');
+	};
 
 	const handleStatusChange = async () => {
 		try {
@@ -82,6 +96,11 @@ const ContractorRequestDetails: FC<Props> = ({ navigation, route }) => {
 
 	const handleAddLog = useCallback(async () => {
 		try {
+			if (request?.status === 'completed') {
+				// @ts-ignore
+				alert('Thsi request was already completed');
+				return;
+			}
 			if (log === '') {
 				// @ts-ignore
 				alert('Please enter a name for this price');
@@ -146,10 +165,11 @@ const ContractorRequestDetails: FC<Props> = ({ navigation, route }) => {
 					Customer / Client
 				</Text>
 				<TouchableWithoutFeedback
-					onPress={() =>
-						navigation.navigate('ContractorScreen', {
-							contractor: res.contractor as Contractor,
-						})
+					onPress={
+						() => navigation.navigate('ContractorResquestsScreen')
+						// navigation.navigate('ContractorScreen', {
+						// 	contractor: res.contractor as Contractor,
+						// })
 					}
 				>
 					<Text bold>
@@ -157,8 +177,19 @@ const ContractorRequestDetails: FC<Props> = ({ navigation, route }) => {
 						{request?.customer?.lastName}
 					</Text>
 				</TouchableWithoutFeedback>
-
-				<PhoneCall title='Phone' phone={request!.customer!.phone!} />
+				<View
+					style={{
+						flexDirection: 'row',
+						justifyContent: 'space-between',
+						alignItems: 'center',
+						marginRight: 20,
+					}}
+				>
+					<PhoneCall title='Phone' phone={request!.customer!.phone!} />
+					<TouchableOpacity onPress={handleGoToMessageScreen}>
+						<Entypo name='message' size={24} color={theme.TEXT_COLOR} />
+					</TouchableOpacity>
+				</View>
 
 				<View style={{ flexDirection: 'row', alignItems: 'center' }}>
 					<Text>Email: </Text>
@@ -274,7 +305,7 @@ const ContractorRequestDetails: FC<Props> = ({ navigation, route }) => {
 			});
 		const reqSub = db
 			.collection('requests')
-			.doc(route.params.request?.id)
+			.doc(route.params.request.id)
 			.onSnapshot(
 				(snapshot) => {
 					if (snapshot.exists) {
@@ -366,7 +397,14 @@ const ContractorRequestDetails: FC<Props> = ({ navigation, route }) => {
 						<Divider large />
 						<Header
 							title={`Price Items (${logs?.length ? logs.length : 0})`}
-							onPressRight={() => setShowLogModal(true)}
+							onPressRight={() => {
+								if (request?.status === 'completed') {
+									// @ts-ignore
+									alert('This request was already completed');
+									return;
+								}
+								setShowLogModal(true);
+							}}
 							iconName='plus-square'
 						/>
 						<LogsView

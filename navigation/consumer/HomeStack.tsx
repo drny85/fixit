@@ -1,7 +1,7 @@
 import React from 'react';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
 
-import { HomeStackParamList } from '../../types';
+import { ConsumerHomeStackParams } from '../../types';
 import {
 	Home,
 	RequestServiceScreen,
@@ -10,19 +10,24 @@ import {
 	ContractorScreen,
 } from '../../screens';
 
-const { Navigator, Screen } = createNativeStackNavigator<HomeStackParamList>();
+const { Navigator, Screen } =
+	createNativeStackNavigator<ConsumerHomeStackParams>();
 
 const HomeStack = () => {
 	return (
 		<Navigator screenOptions={{ animation: 'slide_from_bottom' }}>
-			<Screen name='Home' component={Home} options={{ headerShown: false }} />
 			<Screen
-				name='Contractors'
+				name='ConsumerHome'
+				component={Home}
+				options={{ headerShown: false }}
+			/>
+			<Screen
+				name='ContractorByJob'
 				component={ContractorByJob}
 				options={{ headerShown: false }}
 			/>
 			<Screen
-				name='ContractorScreen'
+				name='ContractorsScreen'
 				component={ContractorScreen}
 				options={{ headerShown: false }}
 			/>

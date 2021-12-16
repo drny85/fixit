@@ -3,7 +3,7 @@ import { View } from 'react-native';
 import { GooglePlacesAutocomplete } from 'react-native-google-places-autocomplete';
 
 import { Text } from '.';
-import { FONTS, SIZES } from '../constants';
+import { COLORS, FONTS, SIZES } from '../constants';
 import { useAppSelector } from '../redux/store';
 
 interface Props {
@@ -80,7 +80,7 @@ const GoogleAutoComplete: FC<Props> = React.forwardRef(
 					onPress={onPress}
 					textInputProps={{
 						//InputComp: InputField,
-						placeholderTextColor: theme.TEXT_COLOR,
+						placeholderTextColor: COLORS.placeHolderTextColor,
 						leftIcon: { type: 'font-awesome', name: 'chevron-left' },
 						errorStyle: { color: 'red' },
 					}}

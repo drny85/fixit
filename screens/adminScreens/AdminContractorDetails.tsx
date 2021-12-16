@@ -162,7 +162,7 @@ const Skill = styled.TouchableOpacity<{ center?: boolean }>`
 	max-width: 200px;
 	margin: 5px;
 	padding: 8px 15px;
-	background-color: ${({ theme }) => theme.BACKGROUND_COLOR};
+	background-color: ${({ theme }) => theme.PRIMARY_BUTTON_COLOR};
 	border-radius: 15px;
 	${({ center }: any) => center && `align-self:center`}
 `;

@@ -7,7 +7,7 @@ export const lightTheme: DefaultTheme = {
 	BUTTON_TEXT_COLOR: '#ffffff',
 	PRIMARY_BUTTON_COLOR: '#1d3557',
 	SHADOW_COLOR: 'rgba(0, 0, 0, 0.19)',
-	SECONDARY_BUTTON_COLOR: '#f1faee',
+	SECONDARY_BUTTON_COLOR: '#4361ee',
 	DONE_COLOR: '#023e8a',
 	STATUS_BAR: 'dark',
 	ASCENT: '#ede0d4',
@@ -21,7 +21,7 @@ export const darkTheme: DefaultTheme = {
 	BUTTON_TEXT_COLOR: '#ffffff',
 	PRIMARY_BUTTON_COLOR: '#1d3557',
 	SHADOW_COLOR: 'rgba(0, 0, 0, 0.19)',
-	SECONDARY_BUTTON_COLOR: '#f1faee',
+	SECONDARY_BUTTON_COLOR: '#4361ee',
 	STATUS_BAR: 'light',
 	ASCENT: '#ede0d4',
 };

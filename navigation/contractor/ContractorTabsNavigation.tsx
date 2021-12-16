@@ -4,9 +4,12 @@ import ContractorHomeStack from './ContractorHomeStack';
 import { Feather } from '@expo/vector-icons';
 import { useAppSelector } from '../../redux/store';
 import ContractorRequestStack from './ContractorRequestStack';
-import ContractorProfileScreen from '../../screens/contractorScreens/ContractorProfileScreen';
+import ContractorProfileScreen from '../../screens/contractorScreens/profile/ContractorProfileScreen';
+import { ContractorNavigationRootParams } from '../../types';
+import ContractorMessageStack from './ContractorMessageStack';
 
-const { Navigator, Screen } = createBottomTabNavigator();
+const { Navigator, Screen } =
+	createBottomTabNavigator<ContractorNavigationRootParams>();
 
 function TabBarIcon(props: {
 	name: React.ComponentProps<typeof Feather>['name'];
@@ -48,7 +51,7 @@ const ContractorTabsNavigation = () => {
 				}}
 			/>
 			<Screen
-				name='RequestStack'
+				name='ContractorRequestStack'
 				component={ContractorRequestStack}
 				options={{
 					title: 'Requests',
@@ -58,8 +61,8 @@ const ContractorTabsNavigation = () => {
 				}}
 			/>
 			<Screen
-				name='MessageStack'
-				component={ContractorRequestStack}
+				name='ContractorMessageStack'
+				component={ContractorMessageStack}
 				options={{
 					title: 'Message',
 					tabBarIcon: ({ focused, color, size }) => (
@@ -69,7 +72,7 @@ const ContractorTabsNavigation = () => {
 			/>
 
 			<Screen
-				name='ProfileStack'
+				name='ContractorProfileStack'
 				component={ContractorProfileScreen}
 				options={{
 					title: 'Me',

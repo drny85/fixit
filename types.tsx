@@ -102,11 +102,64 @@ export type RequestTabParamList = {
 	Home: undefined;
 };
 
-export type ContractorRequestParamList = {
+export type ConsumerNavigationRootParams = {
+	ConsumerHomeStack: NavigatorScreenParams<ConsumerHomeStackParams> | undefined;
+	ConsumerRequestStack:
+		| NavigatorScreenParams<ConsumerRequestStackParams>
+		| undefined;
+	ConsumerMessageStack:
+		| NavigatorScreenParams<ConsumerMessageStackParams>
+		| undefined;
+	ConsumerProfileStack:
+		| NavigatorScreenParams<ConsumerProfileStackParams>
+		| undefined;
+};
+
+export type ConsumerHomeStackParams = {
+	ConsumerHome: undefined;
+	ContractorByJob: { contractor: Contractor };
+	ContractorsScreen: undefined;
+	RequestServiceScreen: undefined;
+	SuccessScreen: undefined;
+	CustomerProfileScreen: undefined;
+};
+export type ConsumerRequestStackParams = {};
+export type ConsumerMessageStackParams = {
+	ConsumerMessageScreen: { request: Request };
+	ConsumerMessageDetails: { request: Request };
+};
+export type ConsumerProfileStackParams = {
+	ConsumerProfile: undefined;
+};
+
+export type ContractorNavigationRootParams = {
+	ContractorHomeStack:
+		| NavigatorScreenParams<ContractorHomeStackParams>
+		| undefined;
+	ContractorRequestStack:
+		| NavigatorScreenParams<ContractorRequestStackParams>
+		| undefined;
+	ContractorMessageStack:
+		| NavigatorScreenParams<ContractorMessageStackParams>
+		| undefined;
+	ContractorProfileStack:
+		| NavigatorScreenParams<ContractorProfileStackParams>
+		| undefined;
+};
+
+export type ContractorHomeStackParams = {
 	ContractorHome: undefined;
-	ContractorRequestsScreen: undefined;
+	ConnectedAccountScreen: undefined;
+};
+export type ContractorRequestStackParams = {
+	ContractorResquestsScreen: { requestsStatus: Request['status'] } | undefined;
 	ContractorRequestDetails: { request: Request };
 };
+export type ContractorMessageStackParams = {
+	ContractorMessageScreen: undefined;
+	ContractorMessageDetails: { request: Request };
+};
+export type ContractorProfileStackParams = {};
 
 export type HomeScreenNavigationProp = CompositeNavigationProp<
 	BottomTabNavigationProp<RootTabParamList, 'HomeStacks'>,

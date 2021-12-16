@@ -11,6 +11,8 @@ import { Text } from '.';
 import { FONTS, SIZES } from '../constants';
 import { useAppSelector } from '../redux/store';
 import styled from 'styled-components/native';
+import { getServices } from '../redux/servicesReducer/servicesActions';
+import { Service } from '../constants/Services';
 
 interface Props {
 	visible: boolean;
@@ -23,6 +25,10 @@ const SkillsModalView: FC<Props> = ({ visible, onPress, setVisible }) => {
 	const { services, servicesSelected } = useAppSelector(
 		(state) => state.services
 	);
+
+	const checked = (s: Service) => {
+		return servicesSelected.includes(s);
+	};
 
 	return (
 		<Modal
@@ -115,7 +121,7 @@ const SkillsModalView: FC<Props> = ({ visible, onPress, setVisible }) => {
 								uncheckedIcon='circle-o'
 								title={service.name}
 								key={service.id}
-								checked={servicesSelected.includes(service)}
+								checked={checked(service)}
 								onPress={() => onPress(service)}
 							/>
 						)}

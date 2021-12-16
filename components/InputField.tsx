@@ -1,7 +1,14 @@
 import React, { FC } from 'react';
-import { View, Text, TextInput, StyleProp, TextStyle } from 'react-native';
+import {
+	View,
+	Text,
+	TextInput,
+	StyleProp,
+	TextStyle,
+	ViewStyle,
+} from 'react-native';
 
-import { FONTS, SIZES } from '../constants';
+import { COLORS, FONTS, SIZES } from '../constants';
 import { useAppSelector } from '../redux/store';
 
 interface Props {
@@ -16,10 +23,11 @@ interface Props {
 	contentStyle?: StyleProp<TextStyle>;
 	keyboardType?: TextInput['props']['keyboardType'];
 	maxLenght?: number;
+	containerStyle?: ViewStyle;
 	errorStyle?: StyleProp<TextStyle>;
 	multiline?: boolean;
 	secureTextEntry?: boolean;
-	autoCapitalize?: 'none' | 'words' | 'sentences';
+	autoCapitalize?: TextInput['props']['autoCapitalize'];
 }
 
 const InputField: FC<Props> = React.forwardRef(
@@ -33,6 +41,7 @@ const InputField: FC<Props> = React.forwardRef(
 			leftIcon,
 			rightIcon,
 			keyboardType,
+			containerStyle,
 			errorMessage,
 			multiline,
 			autoCapitalize,
@@ -62,20 +71,23 @@ const InputField: FC<Props> = React.forwardRef(
 				</View>
 				{/* INPUT */}
 				<View
-					style={{
-						flexDirection: 'row',
-						alignItems: 'center',
-						backgroundColor: theme.SHADOW_COLOR,
-						paddingHorizontal: 8,
-						paddingVertical: 14,
-						borderRadius: 10,
-						marginHorizontal: 10,
-						shadowOffset: { width: 6, height: 6 },
-						shadowColor: theme.SHADOW_COLOR,
-						shadowOpacity: 0.4,
-						shadowRadius: 6,
-						elevation: 6,
-					}}
+					style={[
+						{
+							flexDirection: 'row',
+							alignItems: 'center',
+							backgroundColor: theme.SHADOW_COLOR,
+							paddingHorizontal: 8,
+							paddingVertical: 14,
+							borderRadius: 10,
+							marginHorizontal: 10,
+							shadowOffset: { width: 6, height: 6 },
+							shadowColor: theme.SHADOW_COLOR,
+							shadowOpacity: 0.4,
+							shadowRadius: 6,
+							elevation: 6,
+						},
+						containerStyle,
+					]}
 				>
 					{leftIcon}
 					<TextInput
@@ -90,7 +102,7 @@ const InputField: FC<Props> = React.forwardRef(
 							contentStyle,
 						]}
 						value={value}
-						placeholderTextColor={theme.TEXT_COLOR}
+						placeholderTextColor={COLORS.placeHolderTextColor}
 						multiline={multiline}
 						keyboardType={keyboardType}
 						autoCorrect={false}

@@ -1,8 +1,9 @@
 import { Entypo } from '@expo/vector-icons';
 import React, { FC } from 'react';
-import { View, TouchableOpacity, StyleSheet, ViewStyle } from 'react-native';
+import { TouchableOpacity, StyleSheet, ViewStyle } from 'react-native';
 import { Text } from '.';
 import { SIZES } from '../constants';
+import { useAppSelector } from '../redux/store';
 
 interface Props {
 	title: string;
@@ -11,8 +12,16 @@ interface Props {
 }
 
 const ListItemSetting: FC<Props> = ({ title, onPress, containerStyle }) => {
+	const theme = useAppSelector((state) => state.theme);
 	return (
-		<TouchableOpacity style={[styles.view, containerStyle]} onPress={onPress}>
+		<TouchableOpacity
+			style={[
+				styles.view,
+				{ backgroundColor: theme.SHADOW_COLOR },
+				containerStyle,
+			]}
+			onPress={onPress}
+		>
 			<Text lightText bold>
 				{title}
 			</Text>

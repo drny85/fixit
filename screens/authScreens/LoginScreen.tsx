@@ -8,7 +8,7 @@ import {
 import { InputField, Loader, Screen, Text } from '../../components';
 import { KeyboardAwareScrollView } from 'react-native-keyboard-aware-scroll-view';
 import styled from 'styled-components/native';
-import { theme } from '../../redux/themeReducer/themeSlide';
+
 import { useAppDispatch, useAppSelector } from '../../redux/store';
 import { isEmailValid } from '../../utils/IsEmailValid';
 import { autoSignInUser } from '../../redux/authReducer/authActions';
@@ -17,12 +17,7 @@ import { AuthTabParamList } from '../../types';
 import { NativeStackScreenProps } from '@react-navigation/native-stack';
 import { auth, db } from '../../firebase';
 import { SIZES } from '../../constants';
-import {
-	AntDesign,
-	Feather,
-	Ionicons,
-	MaterialIcons,
-} from '@expo/vector-icons';
+import { Feather, MaterialIcons } from '@expo/vector-icons';
 import Layout from '../../constants/Layout';
 import { setUserRole } from '../../redux/authReducer/authSlider';
 import { Contractor } from '../../constants/Contractors';

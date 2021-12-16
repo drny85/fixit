@@ -1,9 +1,11 @@
 import React from 'react';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
-import ContractorHome from '../../screens/contractorScreens/ContractorHome';
+import ContractorHome from '../../screens/contractorScreens/home/ContractorHome';
 import ConnectedAccountScreen from '../../screens/contractorScreens/ConnectedAccountScreen';
+import { ContractorHomeStackParams } from '../../types';
 
-const { Navigator, Screen } = createNativeStackNavigator();
+const { Navigator, Screen } =
+	createNativeStackNavigator<ContractorHomeStackParams>();
 
 const ContractorHomeStack = () => {
 	return (
